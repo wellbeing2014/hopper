@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.controller;
+package org.zxp.funk.hopper.jpacontroller;
 
 import java.util.HashMap;
 import java.util.Map;

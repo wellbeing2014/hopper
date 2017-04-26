@@ -1,7 +1,6 @@
-package org.zxp.funk.hopper.service;
+package org.zxp.funk.hopper.jpaservice;
 
-import org.springframework.transaction.annotation.Transactional;
-import org.zxp.funk.hopper.entity.ServerConfig;
+import org.zxp.funk.hopper.jpa.model.ServerConfig;
 
 public interface SystemService {
 	public void addTomcat(ServerConfig server);
