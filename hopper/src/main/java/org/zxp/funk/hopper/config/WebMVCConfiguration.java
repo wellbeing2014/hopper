@@ -16,18 +16,16 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
-import org.zxp.funk.hopper.interceptor.CommonInterceptor;
 
 
 	@Configuration
 	//<mvc:annotation-driven/>
 	@EnableWebMvc
-	@ComponentScan(basePackages={"org.zxp.funk.hopper.jpacontroller","org.zxp.funk.hopper.jpaservice"})
+	@ComponentScan(basePackages={"org.zxp.funk.hopper.controller","org.zxp.funk.hopper.service"})
 	public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
 	
 	// equals: <mvc:default-servlet-handler/>

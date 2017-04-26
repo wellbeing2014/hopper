@@ -1,4 +1,6 @@
-package org.zxp.funk.hopper.jpacontroller;
+package org.zxp.funk.hopper.controller;
+
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,13 +11,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.zxp.funk.hopper.jpa.model.ServerConfig;
-import org.zxp.funk.hopper.jpaservice.SystemService;
+import org.zxp.funk.hopper.service.SystemService;
 
 @Controller
-@RequestMapping({"system1"})
-public class SystemJpaController {
-	private static Logger logger = LoggerFactory.getLogger(SystemJpaController.class);
+@RequestMapping({"system"})
+public class SystemController {
+	private static Logger logger = LoggerFactory.getLogger(SystemController.class);
 	
 	@Autowired
 	SystemService sysService;
@@ -44,6 +47,13 @@ public class SystemJpaController {
 		sc.setPath(path);
 		sysService.addTomcat(sc);
 		return "system/addServerConifg";
+	}
+	
+	@RequestMapping(value="getTomcat.json", method = RequestMethod.GET)
+	@ResponseBody
+	public List<ServerConfig> findAllServerConfig()
+	{
+		return sysService.findAllTomcat();
 	}
 }
 

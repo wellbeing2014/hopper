@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.jpacontroller;
+package org.zxp.funk.hopper.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.zxp.funk.hopper.entity.User;
+import org.zxp.funk.hopper.jpa.model.User;
 import org.zxp.funk.hopper.service.UserService;
 
 @Controller

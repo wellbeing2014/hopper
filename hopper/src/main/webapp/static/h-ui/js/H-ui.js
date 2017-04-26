@@ -4110,6 +4110,30 @@ $(function() {
 	}
 } (window.jQuery);
 
+!function($) {
+	$.Huitab_ext = function(tabBar, tabCon, class_name, tabEvent, i, callback) {
+		var $tab_menu = $(tabBar);
+		// 初始化操作
+		$tab_menu.removeClass(class_name);
+		$(tabBar).eq(i).addClass(class_name);
+		$(tabCon).hide();
+		$(tabCon).eq(i).show();
+		callback && callback(i);
+		
+		$tab_menu.on(tabEvent,
+		function(event) {
+			$tab_menu.removeClass(class_name);
+			$(this).addClass(class_name);
+			var index = $tab_menu.index(this);
+			$(tabCon).hide();
+			$(tabCon).eq(index).show();
+			alert(index);
+			callback && callback(index);
+	        event.stopPropagation();
+		});
+	}
+} (window.jQuery);
+
 /* =======================================================================
  * jQuery.Huifold.js 折叠
  * ========================================================================*/

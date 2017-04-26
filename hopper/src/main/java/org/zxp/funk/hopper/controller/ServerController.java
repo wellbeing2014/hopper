@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.jpacontroller;
+package org.zxp.funk.hopper.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
