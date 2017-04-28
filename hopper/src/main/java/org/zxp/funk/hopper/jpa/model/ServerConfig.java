@@ -5,16 +5,21 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.zxp.funk.hopper.utils.Platform;
  
 @Entity
-@Table(name="config_serv")
+@Table(name="conf_servers")
 public class ServerConfig implements Serializable {
+	
+	
  
     /**
 	 * @fieldName: serialVersionUID
@@ -34,11 +39,17 @@ public class ServerConfig implements Serializable {
     @Column(name = "NAME", nullable = false)
     private String name;
     
-    @Size(min=3, max=50)
-    @Column(name = "LOCALPATH", nullable = false)
+    @Size(min=3, max=200)
+    @Column(name = "PATH", nullable = false)
     private String path;
- 
-    public String getId() {
+    
+    @Column(name = "ARGS")
+    private String args;
+    
+    @Column(name = "PLAT",columnDefinition="INT(1) default 1")
+    private int plat; 
+
+	public String getId() {
         return id;
     }
  
@@ -61,7 +72,23 @@ public class ServerConfig implements Serializable {
     public void setPath(String path) {
         this.path = path;
     }
- 
+    
+    
+    public String getArgs() {
+		return args;
+	}
+
+	public void setArgs(String args) {
+		this.args = args;
+	}
+
+	public Platform getPlat() {
+		return Platform.parse(this.plat);
+	}
+
+	public void setPlat(int plat) {
+		this.plat = plat;
+	}
     
  
     @Override

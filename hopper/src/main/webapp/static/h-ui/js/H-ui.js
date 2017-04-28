@@ -4127,7 +4127,6 @@ $(function() {
 			var index = $tab_menu.index(this);
 			$(tabCon).hide();
 			$(tabCon).eq(index).show();
-			alert(index);
 			callback && callback(index);
 	        event.stopPropagation();
 		});

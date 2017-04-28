@@ -6,5 +6,7 @@ import org.zxp.funk.hopper.jpa.model.ServerConfig;
 
 public interface SystemService {
 	public void addTomcat(ServerConfig server);
+	public ServerConfig findOne(String id);
+	public void delTomcat(String id);
 	public List<ServerConfig> findAllTomcat();
 }

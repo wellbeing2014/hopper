@@ -31,6 +31,21 @@ public class SystemServiceImpl implements SystemService {
 
 
 
+	@Override
+	public void delTomcat(String id) {
+		srRep.delete(id);
+	}
+
+
+
+	@Override
+	public ServerConfig findOne(String id) {
+		// TODO Auto-generated method stub
+		return srRep.findOne(id);
+	}
+
+
+
 
 
 

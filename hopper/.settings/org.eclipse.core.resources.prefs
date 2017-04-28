@@ -6,5 +6,5 @@ encoding//src/main/webapp/WEB-INF/views/index.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/menu.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/meta.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/server/index.jsp=UTF-8
-encoding//src/main/webapp/WEB-INF/views/system/addServerConifg.jsp=UTF-8
 encoding//src/main/webapp/WEB-INF/views/system/index.jsp=UTF-8
+encoding//src/main/webapp/WEB-INF/views/system/serverConifg.jsp=UTF-8

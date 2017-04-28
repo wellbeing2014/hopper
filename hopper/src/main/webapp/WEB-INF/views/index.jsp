@@ -1,4 +1,5 @@
-﻿<%@ include file="/WEB-INF/views/meta.jsp" %>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%> 
+<%@ include file="/WEB-INF/views/meta.jsp" %>
 
 <title>H-ui.admin v3.0</title>
 <meta name="keywords" content="H-ui.admin v3.0,H-ui网站后台模版,后台模版下载,后台管理系统模版,HTML后台模版下载">
