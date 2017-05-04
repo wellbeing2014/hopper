@@ -1,8 +1,6 @@
 ﻿<%@ include file="/WEB-INF/views/meta.jsp" %>
 
-<title>添加TOMCAT容器</title>
-</head>
-<body>
+
 <article class="cl pd-20">
 	<form action="/system/add.json" method="post" class="form form-horizontal" id="form-member-add">
 		<div class="row cl">

@@ -24,3 +24,9 @@
 <!--[if IE 6]>
 <script type="text/javascript" src="http://lib.h-ui.net/DD_belatedPNG_0.0.8a-min.js" ></script>
 <script>DD_belatedPNG.fix('*');</script><![endif]-->
+
+<title>hopper平台 -专业挖坑平台</title>
+<meta name="keywords" content="hopper平台,专业,挖坑,坑爹">
+<meta name="description" content="hopper平台 -专业挖坑平台，是一款挖坑人自己的平台。">
+</head>
+<body>
