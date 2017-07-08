@@ -2,18 +2,18 @@ package org.zxp.funk.hopper.jpa.model;
 
 
 import java.io.Serializable;
+import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.Size;
+import javax.print.attribute.standard.DateTimeAtCompleted;
 
 import org.hibernate.annotations.GenericGenerator;
  
 @Entity
-@Table(name="SERVER")
+@Table(name="OPERATION")
 public class ServerOperation implements Serializable {
 	
 	
@@ -21,91 +21,56 @@ public class ServerOperation implements Serializable {
     /**
 	 * @fieldName: serialVersionUID
 	 * @fieldType: long
-	 * @Description: TODO
+	 * @Description: 操作表
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     //@Column(columnDefinition = "CHAR(32)")
-    @Column(name = "ID")
 	@Id
-    private String id;
- 
-    @Size(min=3, max=50)
-    @Column(name = "NAME", nullable = false)
-    private String name;
-    
-    @Size(min=3, max=200)
-    @Column(name = "BASEPATH", nullable = false)
-    private String basepath;
-    
-    @Column(name = "ARGS")
-    private String args;
-    
-    
-
-	public String getId() {
-        return id;
-    }
- 
-    public void setId(String id) {
-        this.id = id;
-    }
- 
-    public String getName() {
-        return name;
-    }
- 
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public String getBasePath() {
-        return basepath;
-    }
- 
-    public void setBasePath(String basepath) {
-        this.basepath = basepath;
-    }
-    
-    
-    public String getArgs() {
-		return args;
+    private String operationid;
+	private String serverid;
+	private int operationtype;
+	private String operator;
+	private Date operationtime;
+	public String getOperationid() {
+		return operationid;
 	}
-
-	public void setArgs(String args) {
-		this.args = args;
+	public void setOperationid(String operationid) {
+		this.operationid = operationid;
 	}
-
+	public String getServerid() {
+		return serverid;
+	}
+	public void setServerid(String serverid) {
+		this.serverid = serverid;
+	}
+	public int getOperationtype() {
+		return operationtype;
+	}
+	public void setOperationtype(int operationtype) {
+		this.operationtype = operationtype;
+	}
+	public String getOperator() {
+		return operator;
+	}
+	public void setOperator(String operator) {
+		this.operator = operator;
+	}
+	public Date getOperationtime() {
+		return operationtime;
+	}
+	public void setOperationtime(Date operationtime) {
+		this.operationtime = operationtime;
+	}
 	
-    
- 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result;
-        return result;
-    }
- 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof ServerOperation))
-            return false;
-        ServerOperation other = (ServerOperation) obj;
-        if (id != other.id)
-            return false;
-        return true;
-    }
- 
-    @Override
-    public String toString() {
-        return "serverConfig [id=" + id + ", name=" + name +  "]";
-    }
+	public ServerOperation(String serverid){
+		this.serverid = serverid;
+		this.operationtime = new Date();
+	}
+	public ServerOperation(){
+		
+	}
      
 }

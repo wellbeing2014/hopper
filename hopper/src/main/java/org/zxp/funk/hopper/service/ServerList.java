@@ -1,7 +1,10 @@
 package org.zxp.funk.hopper.service;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
@@ -10,41 +13,101 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.zxp.funk.hopper.core.IhopperExecutor;
 import org.zxp.funk.hopper.core.ServerBehavior;
 import org.zxp.funk.hopper.entity.ServerStatus;
-import org.zxp.funk.hopper.jpa.model.ServerInstance;
-import org.zxp.funk.hopper.jpa.repository.ServerInstanceRepository;
+import org.zxp.funk.hopper.jpa.model.ServerOperation;
+import org.zxp.funk.hopper.jpa.model.TomcatServer;
+import org.zxp.funk.hopper.jpa.repository.ServerOperationRepository;
+import org.zxp.funk.hopper.jpa.repository.TomcatServerRepository;
 
 @Component
 @Scope("singleton")
 public class ServerList {
-	private static Logger logger=LoggerFactory.getLogger("ºËĞÄÁĞ±í");
-	private List<ServerBehavior> list = new ArrayList<ServerBehavior>();
+	private static Logger logger=LoggerFactory.getLogger("æ ¸å¿ƒæœåŠ¡åˆ—è¡¨");
+	private   ConcurrentLinkedQueue<ServerBehavior> list = new ConcurrentLinkedQueue<ServerBehavior>();
+	private   ConcurrentLinkedQueue<ServerStatus> cache = new ConcurrentLinkedQueue<ServerStatus>();
+	ReadWriteLock rwlock = new ReentrantReadWriteLock(); 
+	
 	@Autowired
-	ServerInstanceRepository rep;
+	TomcatServerRepository serverRep;
+	
+	@Autowired
+	ServerOperationRepository operationRep;
 	
 	@PostConstruct
 	public void init(){
-		logger.debug("ÕıÔÚ×°ÔØ·şÎñÁĞ±í£¬¹² "+rep.count()+" ¸ö");
-		List<ServerInstance> list1 = rep.findAll();
+		logger.info("æ­£åœ¨è£…å¡«æœåŠ¡ï¼š"+serverRep.count()+"æ¡");
+		List<TomcatServer> serverlist = serverRep.findAll();
 		
-		for(ServerInstance ins:list1){
-			list.add(new ServerBehavior(ins));
+		for(TomcatServer server:serverlist){
+			ServerBehavior sb = new ServerBehavior(server);
+			sb.operations= operationRep.findByServerid(server.getServerid());
+			list.add(sb);
 		}
+		flush();
+	}
+	
+	public void flush(){
+		
+		//if(rwlock.writeLock().tryLock()){
+		//	try{
+		cache.clear();
+		for(ServerBehavior sb:list){
+			cache.add(sb.status);
+		}
+			//}
+			//finally{rwlock.writeLock().unlock();}
+		//}
+	}
+	
+	public ServerStatus[] getAll(){
+			return cache.toArray(new ServerStatus[0]);
+	}
+	
+	public boolean add(TomcatServer server){
+		ServerBehavior sb  =new ServerBehavior(server);
+		list.add(sb);
+		flush();
+		return true;
+	}
+	
+	public void startup(String id) throws Exception{
+		
+		ServerBehavior serverb= null;
+		for(ServerBehavior sb:list){
+			if(sb.server.getServerid().equals(id)){
+				serverb = sb;
+				break;
+			}
+		}
+		if(serverb==null) throw new Exception("æœªæ‰¾åˆ°ç›¸åº”æœåŠ¡ï¼š"+id);
+		
+		Date oprtime = new Date();
+		serverb.server.setOperations(serverb.server.getOperations()+1);
+		serverb.server.setLasttime(oprtime);
+		ServerOperation so = new ServerOperation(serverb.server.getServerid());
+		so.setOperationtime(oprtime);
+		so.setOperationtype(1);
+		so.setOperator("testor");
+		serverb.startup();
+		operationRep.save(so);
+		serverRep.save(serverb.server);
+		serverb.operations.add(0, so);
 		
 	}
 	
-	public List<ServerStatus> wapper(){
+	public void shutdown(String id) throws Exception{
 		
-		List<ServerStatus> ret = new ArrayList<ServerStatus>();
-		for(ServerBehavior sb: list){
-			
-			ServerStatus ss = new ServerStatus();
-			ss.setId(sb.getServerInstance().getId());
-			ss.setName(sb.getServerInstance().getName());
-			ss.setStatus(sb.getTomcatStatus().toString());
-			ret.add(ss);
+		ServerBehavior serverb= null;
+		for(ServerBehavior sb:list){
+			if(sb.server.getServerid().equals(id)){
+				serverb = sb;
+				break;
+			}
 		}
-		return ret;
+		if(serverb==null) throw new Exception("æœªæ‰¾åˆ°ç›¸åº”æœåŠ¡ï¼š"+id);
+		serverb.shutdown();
+		
 	}
 }

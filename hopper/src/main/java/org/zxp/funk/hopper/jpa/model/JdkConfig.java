@@ -8,13 +8,17 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.zxp.funk.hopper.utils.Platform;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
  
 @Entity
-@Table(name="SERVER")
-public class ServerInstance implements Serializable {
+@Table(name="conf_jdks")
+public class JdkConfig implements Serializable {
 	
 	
  
@@ -33,17 +37,19 @@ public class ServerInstance implements Serializable {
     private String id;
  
     @Size(min=3, max=50)
-    @Column(name = "NAME", nullable = false)
-    private String name;
+    @Column(name = "JDKNAME", nullable = false)
+    private String jdkname;
     
     @Size(min=3, max=200)
-    @Column(name = "BASEPATH", nullable = false)
-    private String basepath;
+    @Column(name = "CLASSPATH", nullable = false)
+    private String classpath;
     
-    @Column(name = "ARGS")
-    private String args;
+    @Column(name = "JAVAHOME")
+    private String javahome;
     
-    
+    @Column(name = "REMARK")
+    private String remark;
+   
 
 	public String getId() {
         return id;
@@ -52,52 +58,48 @@ public class ServerInstance implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
- 
-    public String getName() {
-        return name;
-    }
- 
-    public void setName(String name) {
-        this.name = name;
-    }
     
-    public String getBasePath() {
-        return basepath;
-    }
- 
-    public void setBasePath(String basepath) {
-        this.basepath = basepath;
-    }
-    
-    
-    public String getArgs() {
-		return args;
+    public String getJdkname() {
+		return jdkname;
 	}
 
-	public void setArgs(String args) {
-		this.args = args;
+	public void setJdkname(String jdkname) {
+		this.jdkname = jdkname;
 	}
 
-	
-    
- 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result;
-        return result;
-    }
- 
-    @Override
+	public String getClasspath() {
+		return classpath;
+	}
+
+	public void setClasspath(String classpath) {
+		this.classpath = classpath;
+	}
+
+	public String getJavahome() {
+		return javahome;
+	}
+
+	public void setJavahome(String javahome) {
+		this.javahome = javahome;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	@Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof ServerInstance))
+        if (!(obj instanceof JdkConfig))
             return false;
-        ServerInstance other = (ServerInstance) obj;
+        JdkConfig other = (JdkConfig) obj;
         if (id != other.id)
             return false;
         return true;
@@ -105,7 +107,7 @@ public class ServerInstance implements Serializable {
  
     @Override
     public String toString() {
-        return "serverinstance [id=" + id + ", name=" + name +  "]";
+        return "jdk [id=" + id + ", jdkname=" + jdkname +  "]";
     }
      
 }

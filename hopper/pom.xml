@@ -169,7 +169,9 @@
             <artifactId>maven-war-plugin</artifactId>
             <version>2.6</version>
             <configuration>
+            	<argLine>-Dfile.encoding=GBK</argLine> 
                 <failOnMissingWebXml>false</failOnMissingWebXml>
+                <encoding>GBK</encoding>
             </configuration>
         </plugin>
     </plugins>

@@ -16,15 +16,15 @@
 			<div class="formControls col-xs-8 col-sm-9 skin-minimal">
 				<div class="radio-box">
 					<input name="platform" type="radio" value="1" id="plat-1" checked>
-					<label for="plat-1">X64</label>
+					<label for="plat-1">X86</label>
 				</div>
 				<div class="radio-box">
 					<input name="platform" type="radio" value="2" id="plat-2" >
-					<label for="plat-2">X86</label>
+					<label for="plat-2">X64</label>
 				</div>
 				<div class="radio-box">
-					<input name="platform" type="radio" value="9" id="plat-9" >
-					<label for="plat-9">其他</label>
+					<input name="platform" type="radio" value="0" id="plat-0" >
+					<label for="plat-0">ANY</label>
 				</div>
 			</div>
 		</div>
@@ -36,20 +36,14 @@
 			</div>
 		</div>
 		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>附加参数：</label>
+			<label class="form-label col-xs-4 col-sm-3">附加参数：</label>
 			<div class="formControls col-xs-8 col-sm-9">
 				<input type="text" class="input-text" placeholder="" name="args" id="args" value="${server.args}" />
 			</div>
 		</div>
 		
 		
-		<div class="row cl">
-			<label class="form-label col-xs-4 col-sm-3">备注：</label>
-			<div class="formControls col-xs-8 col-sm-9">
-				<textarea name="beizhu" cols="" rows="" class="textarea"  placeholder="简要描述" ></textarea>
-				<p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
-			</div>
-		</div>
+		
 		<div class="row cl">
 			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
 				<input class="btn btn-primary radius" type="submit" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
@@ -70,6 +64,19 @@
 <script type="text/javascript">
 
 $(function(){
+	var platform = parseInt("${server.platform}");
+	switch(platform){
+		case 1:
+			$("#plat-1").attr("checked",true);
+			break;
+		case 2:
+			$("#plat-2").attr("checked",true);
+			break;
+		case 0:
+			$("#plat-0").attr("checked",true);
+			break;			 
+	};
+	
 	$('.skin-minimal input').iCheck({
 		checkboxClass: 'icheckbox-blue',
 		radioClass: 'iradio-blue',
@@ -91,7 +98,7 @@ $(function(){
 				required:true
 			},
 			args:{
-				required:true
+				required:false
 			},
 			localpath:{
 				required:true,

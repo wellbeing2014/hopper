@@ -2,6 +2,7 @@ package hopper;
 
 import java.nio.charset.Charset;
 
+import org.zxp.funk.hopper.core.HopperException;
 import org.zxp.funk.hopper.core.TomcatExecutor;
 import org.zxp.funk.hopper.core.TomcatLogEventListener;
 import org.zxp.funk.hopper.core.TomcatLogEventObject;
@@ -9,7 +10,7 @@ import org.zxp.funk.hopper.core.TomcatStatusEventListener;
 import org.zxp.funk.hopper.core.TomcatStatusEventObject;
 
 public class TestRun {
-	public static void main(String args[])
+	public static void main(String args[]) throws HopperException
 	{
 		System.out.println(Charset.defaultCharset().name());
 		TomcatExecutor tomcat = new TomcatExecutor();

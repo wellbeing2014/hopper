@@ -6,7 +6,7 @@
 <%@ include file="/WEB-INF/views/menu.jsp" %>
 
 <section class="Hui-article-box" >
-	<nav class="breadcrumb"><i class="Hui-iconfont"></i> <a href="/" class="maincolor">首页</a> <span class="c-999 en">&gt;</span><span class="c-666">192.10.110.206</span></nav>
+	<nav class="breadcrumb"><i class="Hui-iconfont"></i> <a href="/" class="maincolor">首页</a> <span class="c-999 en">&gt;</span><span class="c-666">服务管理</span><span class="c-999 en">&gt;</span><span class="c-666">我的收藏</span></nav>
 	<div class="Hui-article">
 		<article class="cl pd-20">
 			<div class="text-c">
@@ -27,64 +27,76 @@
 			</div>
 			<div class="cl pd-5 bg-1 bk-gray mt-20">
 				<span class="l"> 
-				
-				<a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> <a href="javascript:;" onclick="admin_add('添加管理员','admin-add.html','800','500')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加管理员</a>
+					<a href="javascript:;" onclick="admin_add('添加服务','/server/editServer','800','600')" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe600;</i> 添加服务</a>
 				</span>
-				<span class="r">共有数据：<strong>54</strong> 条</span>
+				
 			</div>
-			<table class="table table-border table-bordered table-bg">
+			<table id="servertable" class="table table-border table-bordered table-bg table-hover">
 				<thead>
 					
 					<tr class="text-c">
-						<th width="25"><input type="checkbox" name="" value=""></th>
 						<th width="40">标识</th>
 						<th width="150">名称</th>
+						<th width="200">服务路径</th>
 						<th >描述</th>
-						<th width="150">统计(操作/浏览)</th>
-						<th width="130">最后操作时间</th>
+						<th width="130">统计(操作/浏览)</th>
+						<th width="120">最后操作时间</th>
 						<th width="100">状态</th>
-						<th width="100">操作</th>
+						<th width="80">操作</th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr class="text-c">
-						<td><input type="checkbox" value="1" name=""></td>
-						<td>8000</td>
-						<td>无锡行政权力2期平台</td>
-						<td>
-							本系统从2017年开始迁移到E:\新测试路径下\WX权力阳光\adsf\目录下
-							数据库密码：：fasdfa 205/test01
-						</td>
-						<td>12/50</td>
-						<td>2014-6-11 11:11:42</td>
-						<td class="td-status"><span class="label label-success radius">已启用</span></td>
-						<td class="td-manage"><a style="text-decoration:none" onClick="admin_stop(this,'10001')" href="javascript:;" title="停用"><i class="Hui-iconfont">&#xe631;</i></a> <a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','admin-add.html','1','800','500')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a> <a title="删除" href="javascript:;" onclick="admin_del(this,'1')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a></td>
-					</tr>
-					<tr class="text-c">
-						<td><input type="checkbox" value="2" name=""></td>
-						<td>8001</td>
-						<td>无锡行政权力平台</td>
-						<td>
-						本系统从2017年开始迁移到E:\新测试路径下\WX权力阳光\adsf\目录下
-							数据库密码：：fasdfa 205/test01
-						</td>
-							<td>12/50</td>
-						<td>2014-6-11 11:11:42</td>
-						<td class="td-status"><span class="label radius">已停用</span></td>
-						<td class="td-manage"><a style="text-decoration:none" onClick="admin_start(this,'10001')" href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe615;</i></a> <a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','admin-add.html','2','800','500')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6df;</i></a> <a title="删除" href="javascript:;" onclick="admin_del(this,'1')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont">&#xe6e2;</i></a></td>
-					</tr>
-				</tbody>
+				<tbody />
+					
 			</table>
 		</article>
 	</div>
 </section>
 
 <%@ include file="/WEB-INF/views/footer.jsp" %>
+
+<script id="template" type="x-tmpl-mustache">
+	{{ #. }}
+	
+	<tr class="text-c">
+		<td>{{mainport}}</td>
+		<td>{{servername}}</td>
+		<td>{{loalpaths}}</td>
+		<td>{{mark}}</td>
+		<td>{{opr}}</td>
+		<td>{{lasttime}}</td>
+		<td class="td-status"><span class="label radius">{{status}}</span></td>
+		<td class="td-manage">
+<a style="text-decoration:none" onClick="admin_start(this,'10001')" href="javascript:;" title="停止"><i class="Hui-iconfont" style="font-size:24px">&#xe6e4;</i></a> 
+<a title="编辑" href="javascript:;" onclick="admin_edit('管理员编辑','/server/editServer?id={{serverid}}','2','800','500')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont"  style="font-size:24px">&#xe60c;</i></a> 
+<a title="删除" href="javascript:;" onclick="admin_del(this,'1')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont"  style="font-size:24px">&#xe609;</i></a>
+		</td>
+	</tr>
+	{{ /. }}
+</script>
 <!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/lib/mustache/2.3.0/mustache.js"></script> 
 <script type="text/javascript" src="/lib/My97DatePicker/4.8/WdatePicker.js"></script> 
 <script type="text/javascript" src="/lib/datatables/1.10.0/jquery.dataTables.min.js"></script> 
 <script type="text/javascript" src="/lib/laypage/1.2/laypage.js"></script> 
 <script type="text/javascript">
+$(document).ready(function() {
+	 getServers();
+});
+
+
+function getServers() {
+    $.getJSON("/server/allserver.json",
+    function (json) {
+    	var tbl_body = $("#servertable>tbody");
+    	var template = $('#template').html();
+	   	Mustache.parse(template);   // optional, speeds up future uses
+	   	var rendered = Mustache.render(template, json);
+	   	tbl_body.html(rendered);
+    });
+};
+
+window.setInterval(function(){getServers()},1000);
+
 /*
 	参数解释：
 	title	标题

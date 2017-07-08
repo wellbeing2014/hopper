@@ -5,15 +5,16 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.zxp.funk.hopper.utils.Platform;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
  
 @Entity
 @Table(name="conf_servers")
@@ -48,6 +49,10 @@ public class ServerConfig implements Serializable {
     
     @Column(name = "PLAT",columnDefinition="INT(1) default 1")
     private int plat; 
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @Transient
+    private int platform;
 
 	public String getId() {
         return id;
@@ -91,7 +96,15 @@ public class ServerConfig implements Serializable {
 	}
     
  
-    @Override
+    public int getPlatform() {
+		return plat;
+	}
+
+	public void setPlatform(int platform) {
+		this.platform = platform;
+	}
+
+	@Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;

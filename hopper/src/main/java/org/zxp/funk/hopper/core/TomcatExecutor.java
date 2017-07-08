@@ -1,6 +1,5 @@
 package org.zxp.funk.hopper.core;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,10 +12,9 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
 import org.apache.commons.exec.PumpStreamHandler;
 
-public class TomcatExecutor extends DefaultExecutor{
+public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
 
-    private final StdOutLog stdOutLog = new StdOutLog(100) {
-		
+    private final HopperOutputSteam stdOutLog = new HopperOutputSteam(100,"gbk") {
 		@Override
 		public void changeRunning(int i) {
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.RUNNING));
@@ -80,8 +78,8 @@ public class TomcatExecutor extends DefaultExecutor{
     	
     }
 
-    public void startup(){
-    	
+    public void startup() throws HopperException{
+    	validateEnv();
     	try {
 			execute(new CommandLine(getTomcatHome()+"/bin/startup.bat"), environment,new DefaultExecuteResultHandler(){
 				@Override
@@ -99,23 +97,19 @@ public class TomcatExecutor extends DefaultExecutor{
 			});
 			
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STARTED));
-		} catch (ExecuteException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e){
+			throw new HopperException("00101","启动服务失败"+e.getMessage());
 		}
     	
     }
     
-    public void shutdown(){
-    	
+    public void shutdown() throws HopperException{
+    	validateEnv();
     	try {
 			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment);
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.SHUTDOWN));
-		} catch (ExecuteException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Exception e){
+			throw new HopperException("00102","ֹͣ关闭服务失败"+e.getMessage());
 		}
     	
     }
@@ -131,7 +125,15 @@ public class TomcatExecutor extends DefaultExecutor{
          }  
     }  
     
-    
+    private void validateEnv() throws HopperException{
+    	if(!environment.containsKey("JAVA_HOME")){
+    		throw new HopperException("00100","����������JAVA_HOME û������");
+    	}
+    	
+    	if(!environment.containsKey("CATALINA_HOME")){
+    		throw new HopperException("00100","����������CATALINA_HOME û������");
+    	}
+    }
     
 
 }

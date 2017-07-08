@@ -5,7 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zxp.funk.hopper.jpa.model.JdkConfig;
 import org.zxp.funk.hopper.jpa.model.ServerConfig;
+import org.zxp.funk.hopper.jpa.repository.JdkConfigRepository;
 import org.zxp.funk.hopper.jpa.repository.ServerConfigRepository;
 
 @Service
@@ -13,6 +15,8 @@ public class SystemServiceImpl implements SystemService {
 
 	@Autowired
 	private ServerConfigRepository srRep;
+	@Autowired
+	private JdkConfigRepository jdk;
 	
 	
 
@@ -42,6 +46,27 @@ public class SystemServiceImpl implements SystemService {
 	public ServerConfig findOne(String id) {
 		// TODO Auto-generated method stub
 		return srRep.findOne(id);
+	}
+
+
+
+	@Override
+	public void addJdk(JdkConfig jdkcof) {
+		jdk.save(jdkcof);
+	}
+
+
+
+	@Override
+	public List<JdkConfig> findAllJdks() {
+		return jdk.findAll();
+	}
+
+
+
+	@Override
+	public void delJdk(String id) {
+		jdk.delete(id);
 	}
 
 

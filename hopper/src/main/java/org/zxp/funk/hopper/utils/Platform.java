@@ -2,7 +2,7 @@ package org.zxp.funk.hopper.utils;
 
 
 public enum Platform {
-    X64(1), X86(0), ORTHER (9);
+    X64(2), X86(1), ANY (0);
 
     private int value;
 
@@ -11,7 +11,7 @@ public enum Platform {
     public int getValue() { return value; }
 
     public static Platform parse(int id) {
-    	Platform plat = null; // Default
+    	Platform plat = Platform.ANY; // Default
         for (Platform item : Platform.values()) {
             if (item.getValue()==id) {
             	plat = item;

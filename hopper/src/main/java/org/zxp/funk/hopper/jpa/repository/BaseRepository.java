@@ -9,5 +9,5 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface BaseRepository<T, ID extends Serializable> extends JpaRepository<T, ID> {
 
-    Optional<T> deleteById(ID id);
+    //Optional<T> deleteById1(ID id);
 }

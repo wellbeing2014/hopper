@@ -3,11 +3,15 @@ package org.zxp.funk.hopper.service;
 import java.util.List;
 
 import org.zxp.funk.hopper.entity.ServerStatus;
-import org.zxp.funk.hopper.jpa.model.ServerInstance;
+import org.zxp.funk.hopper.jpa.model.ServerOperation;
+import org.zxp.funk.hopper.jpa.model.TomcatServer;
 
 public interface ServerService {
-	public boolean startup(ServerInstance server);
-	public boolean shutdown(ServerInstance server);
+	public void startup(String id) throws Exception;
+	public void shutdown(String id) throws Exception;
 	public List<String> getlog(String id);
-	public List<ServerStatus> getStatus();
+	public ServerStatus[] getStatus();
+	public void addOperation(ServerOperation operation);
+	public TomcatServer findOne(String id);
+	void addServer(TomcatServer sc);
 }
