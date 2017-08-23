@@ -14,10 +14,12 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 import org.zxp.funk.hopper.utils.Platform;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
  
 @Entity
 @Table(name="conf_servers")
+@JsonIgnoreProperties({ "plat" })
 public class ServerConfig implements Serializable {
 	
 	
@@ -94,6 +96,11 @@ public class ServerConfig implements Serializable {
 	public void setPlat(int plat) {
 		this.plat = plat;
 	}
+	
+	public void setPlat(String plat) {
+		
+		this.plat = Platform.valueOf(plat).getValue();
+	}
     
  
     public int getPlatform() {
@@ -125,9 +132,11 @@ public class ServerConfig implements Serializable {
             return false;
         return true;
     }
- 
+    
+    
     @Override
     public String toString() {
+    	
         return "serverConfig [id=" + id + ", name=" + name +  "]";
     }
      

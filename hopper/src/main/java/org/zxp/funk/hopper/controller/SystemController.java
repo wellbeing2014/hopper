@@ -45,7 +45,7 @@ public class SystemController {
 	{
 		ModelAndView mav = new ModelAndView();  
         mav.setViewName("system/serverConifg");   
-        mav.addObject("server", sysService.findOne(id));
+        mav.addObject("server", sysService.findOneTomcat(id));
 	    return mav;
 	}
 	
@@ -88,11 +88,18 @@ public class SystemController {
 		return ret;
 	}
 	
-	@RequestMapping(value="getTomcat.json", method = RequestMethod.GET)
+	@RequestMapping(value="getTomcats.json", method = RequestMethod.GET)
 	@ResponseBody
 	public List<ServerConfig> findAllServerConfig()
 	{
 		return sysService.findAllTomcat();
+	}
+	
+	@RequestMapping(value="getaTomcat.json", method = RequestMethod.GET)
+	@ResponseBody
+	public ServerConfig findOneServerConfig(String id)
+	{
+		return sysService.findOneTomcat(id);
 	}
 	
 	@RequestMapping(value="addJdk.json", method = RequestMethod.POST)
@@ -140,7 +147,7 @@ public class SystemController {
 		return ret;
 	}
 	
-	@RequestMapping(value="getJdk.json", method = RequestMethod.GET)
+	@RequestMapping(value="getJdks.json", method = RequestMethod.GET)
 	@ResponseBody
 	public List<JdkConfig> findAllJdks()
 	{

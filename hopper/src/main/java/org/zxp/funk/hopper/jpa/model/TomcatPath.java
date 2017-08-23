@@ -30,6 +30,6 @@ public class TomcatPath{
 	}
 	
 	public String toString(){
-		return this.docbase+"|"+this.contextpath+";";
+		return "{'docbase':'"+this.docbase+"','contextpath':'"+this.contextpath+"'}";
 	}
 }

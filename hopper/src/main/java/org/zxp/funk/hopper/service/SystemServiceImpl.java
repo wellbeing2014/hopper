@@ -43,8 +43,7 @@ public class SystemServiceImpl implements SystemService {
 
 
 	@Override
-	public ServerConfig findOne(String id) {
-		// TODO Auto-generated method stub
+	public ServerConfig findOneTomcat(String id) {
 		return srRep.findOne(id);
 	}
 
@@ -55,7 +54,10 @@ public class SystemServiceImpl implements SystemService {
 		jdk.save(jdkcof);
 	}
 
-
+	@Override
+	public JdkConfig findOneJdk(String id) {
+		return jdk.findOne(id);
+	}
 
 	@Override
 	public List<JdkConfig> findAllJdks() {

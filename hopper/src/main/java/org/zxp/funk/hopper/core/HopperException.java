@@ -1,5 +1,8 @@
 package org.zxp.funk.hopper.core;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class HopperException extends Exception {
 
 	/**
@@ -34,6 +37,17 @@ public class HopperException extends Exception {
 		this.errorMsg = errorMsg;
 	}
 	
-	
+	public static String getStackTrace(Throwable throwable) {
+		String result = throwable.getMessage();
+		try {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw, true);
+			throwable.printStackTrace(pw);
+			result = sw.getBuffer().toString();
+		} catch(Exception e) {
+			
+		}
+        return result;
+    }
 
 }

@@ -12,7 +12,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -34,8 +36,13 @@ public class TomcatServer implements Serializable {
 	private int mainport;
 	private int shutport;
 	private String servername;
-	private String jdkid;
-	private String tomcatid;
+	
+	@OneToOne(cascade={CascadeType.REFRESH})
+    @JoinColumn(name="jdkid")
+	private JdkConfig jdk;
+	@OneToOne(cascade={CascadeType.REFRESH})
+    @JoinColumn(name="tomcatid")
+    private ServerConfig tomcat;
 	private int operations;
 	private Date lasttime;
 	
@@ -51,7 +58,7 @@ public class TomcatServer implements Serializable {
 	public void setOperations(int operations) {
 		this.operations = operations;
 	}
-	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
+	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER ,orphanRemoval=true)
 	@JoinColumn(name="server_id")
 	private List<TomcatPath> tomcatpaths;
 	public List<TomcatPath> getTomcatpaths() {
@@ -88,19 +95,18 @@ public class TomcatServer implements Serializable {
 	public void setServername(String servername) {
 		this.servername = servername;
 	}
-	public String getJdkid() {
-		return jdkid;
+	public ServerConfig getTomcat() {
+		return tomcat;
 	}
-	public void setJdkid(String jdkid) {
-		this.jdkid = jdkid;
+	public void setTomcat(ServerConfig tomcat) {
+		this.tomcat = tomcat;
 	}
-	public String getTomcatid() {
-		return tomcatid;
+	public JdkConfig getJdk() {
+		return jdk;
 	}
-	public void setTomcatid(String tomcatid) {
-		this.tomcatid = tomcatid;
+	public void setJdk(JdkConfig jdk) {
+		this.jdk = jdk;
 	}
-	
 	public String getDesc() {
 		return desc;
 	}
@@ -130,6 +136,21 @@ public class TomcatServer implements Serializable {
 		return ret;
 	}
 	
+	@Override
+	public String toString() {
+		return "serverid:"+serverid+"servername:"+servername;
+	}
 	
+	/**
+	 * @Title: getConfigDirName
+	 * @Description: 获取该服务的配置文件夹名称
+	 * @return
+	 * @return: String
+	 */
+	public String getConfigDirName(){
+		return this.mainport+"_"+this.servername;
+	}
+	
+	 
  
 }

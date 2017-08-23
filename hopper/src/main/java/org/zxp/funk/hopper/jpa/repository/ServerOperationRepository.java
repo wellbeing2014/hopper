@@ -8,4 +8,5 @@ public interface ServerOperationRepository extends BaseRepository<ServerOperatio
 
 	 //@Query("select blog from Blog blog join blog.creator creator where creator.role = ?1")
 	 List<ServerOperation> findByServerid(String serverid);
+	 void deleteByServerid(String serverid);
 }

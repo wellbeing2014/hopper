@@ -25,7 +25,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 	@Configuration
 	//<mvc:annotation-driven/>
 	@EnableWebMvc
-	@ComponentScan(basePackages={"org.zxp.funk.hopper.controller","org.zxp.funk.hopper.service"})
+	@ComponentScan(basePackages={"org.zxp.funk.hopper.controller","org.zxp.funk.hopper.service","org.zxp.funk.hopper.utils"})
 	public class WebMVCConfiguration extends WebMvcConfigurerAdapter {
 	
 	// equals: <mvc:default-servlet-handler/>

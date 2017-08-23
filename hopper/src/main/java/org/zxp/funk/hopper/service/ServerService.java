@@ -13,5 +13,7 @@ public interface ServerService {
 	public ServerStatus[] getStatus();
 	public void addOperation(ServerOperation operation);
 	public TomcatServer findOne(String id);
-	void addServer(TomcatServer sc);
+	TomcatServer addServer(TomcatServer sc) throws Exception;
+	void delServer(String id) throws Exception;
+	
 }

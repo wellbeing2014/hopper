@@ -1,0 +1,224 @@
+﻿<!--#include virtual="/pub/_meta.shtml" -->  
+<title>服务管理</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 服务管理 <span class="c-gray en">&gt;</span>服务列表 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+
+<div class="page-container">
+	<div class="cl pd-5 bg-1 bk-gray"> 
+		<span class="l">  
+		<a class="btn btn-primary radius" href="javascript:;" onclick="server_add('添加服务',null,'800')"><i class="Hui-iconfont">&#xe600;</i> 添加服务</a> 
+		</span> 
+		
+		
+		<span class="r" >
+		<input type="text" v-model="keyword" placeholder="搜名称，端口" style="width:250px" class="input-text">
+		</span>
+		<span class="select-box inline mr-10 r">
+		<select name="" class="select" v-model="status">
+			<option value="-1">全部状态</option>
+			<option value="1">已停止</option>
+			<option value="2">运行中</option>
+			<option value="3">正在…</option>
+		</select>
+		</span> 
+    </div>
+	<table class="table table-border table-bordered table-hover table-bg">
+		
+		<thead>
+			<tr class="text-c">
+				<th width="100">标识</th>
+				<th width="20%">名称</th>
+				<th width="30%">服务路径</th>
+				<th width="130">统计(操作/浏览)</th>
+				<th width="120">最后操作时间</th>
+				<th width="100">状态</th>
+				<th width="120">操作</th>
+			</tr>
+		</thead>
+		<tbody id="serverbody">
+		
+		<tr class="text-c" v-for="server in orderedServers">
+			<td>{{server.mainport}}</td>
+			<td>{{server.servername}}</td>
+			<td>{{server.loalpaths}}</td>
+			<td>{{server.opr}}</td>
+			<td>{{server.lasttime}}</td>
+			<td class="td-status"><span class="label radius" v-bind:class="{ 'label-success': server.status =='运行中', 'label-warning': server.status=='正在启动'||server.status=='正在停止','label-danger':server.status =='已停止'}">{{server.status}}</span></td>
+			<td class="td-manage">
+				<a v-if="server.status =='已停止'" style="text-decoration:none" v-on:click="server_opr(server.servername,server.serverid,1)" href="javascript:;" title="启动"><i class="Hui-iconfont" style="font-size:24px">&#xe6e6;</i></a> 
+				<a v-if="server.status =='运行中' || server.status =='已停止'" style="text-decoration:none" v-on:click="server_opr(server.servername,server.serverid,2)" href="javascript:;" title="停止"><i class="Hui-iconfont" style="font-size:24px">&#xe6e4;</i></a> 
+				<a v-if="ed_allow && server.status =='已停止'" title="编辑" href="javascript:;" v-on:click="server_edit('修改服务',server.serverid,'800')" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont"  style="font-size:24px">&#xe60c;</i></a> 
+				<a v-if="server.status !='已停止'" title="日志" href="javascript:;" v-on:click="server_log('实时日志查看-['+server.servername+']',server.serverid)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont"  style="font-size:24px">&#xe623;</i></a> 
+				<a v-if="ed_allow && server.status =='已停止'" title="删除" href="javascript:;" v-on:click="server_del(server.serverid)" class="ml-5" style="text-decoration:none"><i class="Hui-iconfont"  style="font-size:24px">&#xe609;</i></a>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
+<!--#include virtual="/pub/_footer.shtml" -->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/hopper-res/lib/vue/vue.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/sockjs-1.1.1.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/stomp.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+var stompClient = null;
+var app = new Vue({
+	  el: '.page-container',
+	  data: {
+		  "ed_allow":true,
+		  servers:[],
+		  keyword:"",
+		  status:"-1"
+	  },
+	  methods:{
+		  server_edit:server_add,
+		  server_log:open_log_tab,
+		  server_opr:operate,
+		  server_del:remove
+	  },
+	  computed: {
+	        filterdServers: function () {
+	            var key = this.keyword;
+	            var servers = this.servers;
+	            var status = this.status
+	            return servers.filter(function (server) {
+	            	var statusfilter = true;
+	            	switch(status){
+	            	default:statusfilter=true;break;
+	            	case "1":statusfilter= "已停止"==server.status;break;
+	            	case "2":statusfilter= "运行中"==server.status;break;
+	            	case "3":statusfilter= server.status.indexOf("正在")!=-1;break;
+	            	}
+	                return ((server.servername.toLowerCase().indexOf(key.toLowerCase()) != -1 )||((server.mainport.toString()).indexOf(key) != -1 ))&& statusfilter
+	            });;
+	        },
+	        orderedServers: function () {
+	        	function compare(a, b) {
+	        	      if (a.mainport < b.mainport)
+	        	        return -1;
+	        	      if (a.mainport > b.mainport)
+	        	        return 1;
+	        	      return 0;
+	        	    }
+	        	return this.filterdServers.sort(compare);
+	          }
+	    }
+    });
+connect();
+
+$.getJSON("/server/allserver.json",
+	    function (json) {
+			if(json.success)
+				app.servers = json.retObj
+});
+
+function connect() {
+    var socket = new SockJS('/hopperserver');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/topic/serverstatus', function (status) {
+        	//serverstatus = JSON.parse(status.body);
+        	app.servers= JSON.parse(status.body);
+        });
+    });
+}
+
+
+
+/* $.getJSON("/server/allserver.json",
+    function (json) {
+		if(json.success)
+		 	new Vue({
+			  el: '#serverbody',
+			  data: {
+				  "ed_allow":true,
+				  servers:json.retObj
+			  },
+			  methods:{
+				  server_edit:server_add
+			  }
+		    })
+		else
+			alert(json.msg);
+}); */
+
+/**
+ * 添加服务
+ */
+function server_add(title,id,w,h){
+	var url='server-add.html';
+	if (id!=null)
+		url+='?id='+id;
+	layer_show(title,url,w,h);
+}
+
+
+/**
+ * 启动/停止服务
+ */
+function operate(servername,id,type){
+	var msg="";
+	switch(type){
+	case 1: msg="【"+servername+"】服务准备启动，请确定";break;
+	case 2: msg="【"+servername+"】服务准备停止，请确定";break;
+	default:msg="请确定";break;
+	}
+	layer.confirm(msg,{icon:0,title:"你是认真的吗？"},function(index){
+		$.getJSON("/server/operate.json",{"id":id,"type":type},
+			function (json) {
+				parent.layer.msg(json.msg,{icon:1,time:1000});
+		});
+		 
+		open_log_tab('实时日志查看-['+servername+']',id);
+		layer.close(index);
+	})
+}
+
+/**
+ * 删除
+ */
+function remove(serverid){
+	layer.confirm('的确要删除吗？',{title:"请确认"},function(index){
+		 $.getJSON("/server/remove.json",{"serverid":serverid},
+		    function (json) {
+				parent.layer.msg(json.msg,{icon:1,time:1000});
+			}
+		 );
+		 layer.close(index);
+	})
+}
+
+/**
+ * 日志实时查看
+ */
+function open_log_tab(title,id){
+	var obj = $('<a>',{'data-href':'/server/server-log.html?id='+id,'data-title':title}); 
+	Hui_admin_tab(obj);
+}
+
+/**
+ * 日志实时查看
+ */
+function print_log(title,id,w,h){
+	var url='server-log.html';
+	if (id!=null)
+		url+='?id='+id;
+	layer_show(title,url,w,h);
+}
+
+function tab11(obj){
+	alert(obj);	
+	Hui_admin_tab(obj);
+}
+
+
+</script>
+</body>
+</html>

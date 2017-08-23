@@ -5,6 +5,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -31,7 +33,8 @@ public class ServerOperation implements Serializable {
 	@Id
     private String operationid;
 	private String serverid;
-	private int operationtype;
+	@Enumerated(EnumType.ORDINAL)
+	private OperationType operationtype;
 	private String operator;
 	private Date operationtime;
 	public String getOperationid() {
@@ -46,10 +49,10 @@ public class ServerOperation implements Serializable {
 	public void setServerid(String serverid) {
 		this.serverid = serverid;
 	}
-	public int getOperationtype() {
+	public OperationType getOperationtype() {
 		return operationtype;
 	}
-	public void setOperationtype(int operationtype) {
+	public void setOperationtype(OperationType operationtype) {
 		this.operationtype = operationtype;
 	}
 	public String getOperator() {

@@ -11,7 +11,7 @@ public class ServerStatus {
 	private int mainport;
 	private String servername;
 	private String mark;
-	private String opr;
+	private int opr;
 	private String lasttime;
 	private StringBuffer status;
 	private String[] loalpaths;
@@ -44,10 +44,10 @@ public class ServerStatus {
 	public void setMark(String mark) {
 		this.mark = mark;
 	}
-	public String getOpr() {
+	public int getOpr() {
 		return opr;
 	}
-	public void setOpr(String opr) {
+	public void setOpr(int opr) {
 		this.opr = opr;
 	}
 	public StringBuffer getStatus() {

@@ -59,12 +59,20 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     	return environment.get("CATALINA_HOME");
     }
     
+    public void setJavaOpts(String javaopts){
+    	environment.put("JAVA_OPTS", javaopts);
+    }
+    
+    public String getJavaOpts(){
+    	return environment.get("JAVA_OPTS");
+    }
+    
     public void setTomcatBase(String tomcatBase){
-    	environment.put("TOMCAT_BASE", tomcatBase);
+    	environment.put("CATALINA_BASE", tomcatBase);
     }
     
     public String getTomcatBase(){
-    	return environment.get("TOMCAT_BASE");
+    	return environment.get("CATALINA_BASE");
     }
     
     
@@ -90,9 +98,8 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
 				
 				@Override
 				public void onProcessFailed(ExecuteException e) {
-					// TODO Auto-generated method stub
 					super.onProcessFailed(e);
-					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.SHUTDOWN));
+					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
 				}
 			});
 			
@@ -106,15 +113,27 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     public void shutdown() throws HopperException{
     	validateEnv();
     	try {
-			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment);
+			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment,new DefaultExecuteResultHandler(){
+				@Override
+				public void onProcessComplete(int exitValue) {
+					super.onProcessComplete(exitValue);
+					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
+				}
+				
+				@Override
+				public void onProcessFailed(ExecuteException e) {
+					super.onProcessFailed(e);
+					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
+				}
+			});
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.SHUTDOWN));
 		} catch (Exception e){
-			throw new HopperException("00102","ֹͣ关闭服务失败"+e.getMessage());
+			throw new HopperException("00102","关闭服务失败"+e.getMessage());
 		}
     	
     }
     
-    
+   
     
     public void notifyTomcatStatus(TomcatStatusEventObject obj)  
     {   
@@ -127,11 +146,11 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     
     private void validateEnv() throws HopperException{
     	if(!environment.containsKey("JAVA_HOME")){
-    		throw new HopperException("00100","����������JAVA_HOME û������");
+    		throw new HopperException("00100","未找到环境变量：JAVA_HOME");
     	}
     	
     	if(!environment.containsKey("CATALINA_HOME")){
-    		throw new HopperException("00100","����������CATALINA_HOME û������");
+    		throw new HopperException("00100","未找到环境变量：CATALINA_HOME");
     	}
     }
     

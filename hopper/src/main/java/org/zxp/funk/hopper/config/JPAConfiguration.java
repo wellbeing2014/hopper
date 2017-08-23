@@ -110,10 +110,12 @@ public class JPAConfiguration {
 		dataSource.setTestOnReturn(testOnReturn);
 		dataSource.setPoolPreparedStatements(poolPreparedStatements);
 		dataSource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
+		logger.info("数据库："+url+" 链接成功");
 		try {
 			dataSource.setFilters(filters);
 		} catch (SQLException e) {
 			e.printStackTrace();
+			logger.error("数据库："+url+" 链接失败："+e.getMessage());
 		}
 		return dataSource;
 	}

@@ -1,0 +1,219 @@
+﻿<!--#include virtual="/pub/_meta.shtml" -->  
+<title>服务添加</title>
+</head>
+<body>
+<article class="page-container">
+	<form  class="form form-horizontal" id="form-server-add">
+		<div class="row cl">
+			<input type="hidden"  class="input-text" v-model="server.serverid" placeholder="" id="serverid" name="serverid">
+			<label class="form-label col-xs-3 "><span class="c-red">*</span>端口标识：</label>
+			<div class="formControls col-xs-2 ">
+				<input type="text" class="input-text" v-model="server.mainport" placeholder="" id="mainport" name="mainport">
+			</div>
+			
+			<label class="form-label col-xs-2 "><span class="c-red">*</span>关闭端口：</label>
+			<div class="formControls col-xs-2 ">
+				<input type="text" class="input-text" v-model="server.shutport" placeholder="" id="shutport" name="shutport">
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>服务名称：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" v-model="server.servername" placeholder="" id="servername" name="servername">
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">WEB容器选择：</label>
+			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box">
+				<select id="tomcat" name="tomcat" class="select" v-model="server.tomcat.id">
+					<option v-for="opt in tomcat" v-bind:value="opt.id">{{opt.name}}</option>
+				</select>
+				</span> 
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">JDK选择：</label>
+			<div class="formControls col-xs-8 col-sm-9"> <span class="select-box">
+				<select id="jdkid" name="jdkid" class="select" v-model="server.jdk.id">
+					<option v-for="opt in jdk" v-bind:value="opt.id">{{opt.jdkname}}</option>
+				</select>
+				</span> 
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3"><span class="c-red">*</span>服务器路径：</label>
+			<div class="col-xs-8 col-sm-9">
+				<a style="text-decoration:none" v-on:click="add()"  href="javascript:;" title="启用"><i class="Hui-iconfont">&#xe600;</i></a>
+			</div>
+			<div id="pathcash" class="col-xs-offset-r col-sm-offset-3 col-xs-8 col-sm-9 " >
+				<div class="row cl" v-for="(opt,index) in server.tomcatpaths">
+					<input type="hidden"  class="input-text" v-model="opt.pathid"  id="pathid" name="opt.pathid">
+					<div class="col-sm-5">
+						<input  name="contextpath"  type="text" class="input-text" v-model="opt.contextpath" placeholder="相对路径" />
+					</div>
+					<div class="col-sm-5">
+						<input  name="docbase" type="text" class="input-text" v-model="opt.docbase" placeholder="绝对路径" />
+					</div>
+					<div class="col-sm-1">
+						<a style="text-decoration:none" v-on:click="cancel(index)" href="javascript:;" title="取消"><i class="Hui-iconfont">&#xe6a6;</i></a>
+					</div>
+				</div>
+			
+			</div>
+		</div>
+		
+		
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">JAVA_OPTS参数：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<input type="text" class="input-text" placeholder="" name="opts" id="opts" v-model="server.opts" />
+			</div>
+		</div>
+		
+		<div class="row cl">
+			<label class="form-label col-xs-4 col-sm-3">备注：</label>
+			<div class="formControls col-xs-8 col-sm-9">
+				<textarea name="desc" cols="" rows="" v-model="server.desc" class="textarea"  placeholder="简要描述" ></textarea>
+				<p class="textarea-numberbar"><em class="textarea-length">0</em>/100</p>
+			</div>
+		</div>
+		<div class="row cl">
+			<div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+				<input class="btn btn-primary radius" type="submit" value="提交">
+			</div>
+		</div>
+	</form>
+</article>
+
+<!--#include virtual="/pub/_footer.shtml" -->  
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/hopper-res/lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/jquery.validation/1.14.0/messages_zh.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/vue/vue.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/hopper-common.js"></script>
+<script type="text/javascript">
+
+
+
+$(function(){
+	var server_cur ={tomcatpaths:[{contextpath:"",docbase:""}],tomcat:{},jdk:{}};
+	var serverid = $.getUrlParam('id');
+	var jdks =[];
+	var tomcats =[];
+	
+	$.ajaxSettings.async = false;
+	
+
+	if(serverid!=null)
+		$.getJSON("/server/getServer.json",{"serverid":serverid},
+			    function (json) {
+					server_cur = json.retObj;
+			});
+	console.log(server_cur);
+	$.getJSON("/system/getJdks.json",
+	    function (json) {
+			jdks = json;
+	});
+
+	
+	$.getJSON("/system/getTomcats.json",
+	    function (json) {
+		tomcats = json;
+	});
+	$.ajaxSettings.async = true;
+	
+	
+	
+	var server = new Vue({
+	  el: '#form-server-add',
+	  data: {
+		  server:server_cur,
+		  tomcat:tomcats,"jdk":jdks
+		  
+	  },
+	  methods: {
+			  cancel:function(idx){
+				  server_cur.tomcatpaths.splice(idx,1);
+			  },
+			  
+			  add: function(){
+						server_cur.tomcatpaths.push({contextpath:"",docbase:""});
+					}
+	  		}
+    });
+	
+	$("#form-server-add").validate({
+		rules:{
+			mainport:{
+				required:true,
+				number:true
+			},
+			shutport:{
+				required:true,
+				number:true
+			},
+			servername:{
+				required:true,
+				minlength:3,
+				maxlength:50
+			},
+			tomcatid:{
+				required:true
+			},
+			jdkid:{
+				required:true
+			},
+			platform:{
+				required:true
+			},
+			args:{
+				required:true
+			},
+			docbase:{
+				required:true
+			},
+			contextpath:{
+				required:true
+			}
+		},
+		onkeyup:false,
+		focusCleanup:true,
+		success:"valid",
+		submitHandler:save
+		
+	});
+	
+	function save(){
+		$.ajax({
+	        type:'post',
+	        url:'/server/add.json',
+	        contentType:'application/json;charset=utf-8',//指定为json类型
+	        //数据格式是json串，商品信息
+	        data:JSON.stringify(server_cur),
+	        success:function(data){
+	        	var index = parent.layer.getFrameIndex(window.name);
+	        	if(data.success)
+	        		server_cur.serverid=data.retId;	
+				parent.layer.msg(data.msg,{icon:1,time:1000});
+				parent.layer.close(index);
+	        }       
+	    }); 
+	}
+	
+	
+});
+
+
+
+
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>
