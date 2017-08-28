@@ -10,8 +10,6 @@
 		<span class="l">  
 		<a class="btn btn-primary radius" href="javascript:;" onclick="server_add('添加服务',null,'800')"><i class="Hui-iconfont">&#xe600;</i> 添加服务</a> 
 		</span> 
-		
-		
 		<span class="r" >
 		<input type="text" v-model="keyword" placeholder="搜名称，端口" style="width:250px" class="input-text">
 		</span>
@@ -41,7 +39,7 @@
 		
 		<tr class="text-c" v-for="server in orderedServers">
 			<td>{{server.mainport}}</td>
-			<td>{{server.servername}}</td>
+			<td><a @click="server_desc(server.mark, $event);">{{server.servername}}</a></td>
 			<td>{{server.loalpaths}}</td>
 			<td>{{server.opr}}</td>
 			<td>{{server.lasttime}}</td>
@@ -80,7 +78,8 @@ var app = new Vue({
 		  server_edit:server_add,
 		  server_log:open_log_tab,
 		  server_opr:operate,
-		  server_del:remove
+		  server_del:remove,
+		  server_desc:showdesc
 	  },
 	  computed: {
 	        filterdServers: function () {
@@ -213,11 +212,47 @@ function print_log(title,id,w,h){
 	layer_show(title,url,w,h);
 }
 
-function tab11(obj){
-	alert(obj);	
-	Hui_admin_tab(obj);
+function showdesc(obj,event){
+	var el = event.currentTarget;
+	var offseta = $(el).offset();
+	layer.open({
+		  type: 1,
+		  title: "备注",
+		  closeBtn:0,
+		  shadeClose: true,
+		  offset: [offseta.top+30,offseta.left],
+		  content:  "<div class='mt-20 mb-50 ml-20 mr-20'>"+html_encode(obj)+"</div>"
+		});
 }
 
+function html_encode(str)  
+{  
+    var s = "";  
+    if (str.length == 0) return "";  
+    s = str.replace(/&/g, ">");  
+    s = s.replace(/</g, "<");  
+    s = s.replace(/>/g, ">");  
+    s = s.replace(/ /g, " ");  
+    s = s.replace(/\'/g, "'");  
+    s = s.replace(/\"/g, '"');  
+    s = s.replace(/\n/g, "<br>");  
+    return s;  
+}  
+
+//解码  
+function html_decode(str)  
+{  
+    var s = "";  
+    if (str.length == 0) return "";  
+    s = str.replace(/>/g, "&");  
+    s = s.replace(/</g, "<");  
+    s = s.replace(/>/g, ">");  
+    s = s.replace(/ /g, " ");  
+    s = s.replace(/'/g, "\'");  
+    s = s.replace(/"/g, "\"");  
+    s = s.replace(/<br>/g, "\n");  
+    return s;  
+}  
 
 </script>
 </body>

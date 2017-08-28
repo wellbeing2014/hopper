@@ -13,7 +13,7 @@
 			
 			<label class="form-label col-xs-2 "><span class="c-red">*</span>关闭端口：</label>
 			<div class="formControls col-xs-2 ">
-				<input type="text" class="input-text" v-model="server.shutport" placeholder="" id="shutport" name="shutport">
+				<input type="text" class="input-text"  v-model="server.shutport" v-bind:value="aashutport" placeholder="" id="shutport" name="shutport">
 			</div>
 		</div>
 		
@@ -103,7 +103,7 @@
 
 
 $(function(){
-	var server_cur ={tomcatpaths:[{contextpath:"",docbase:""}],tomcat:{},jdk:{}};
+	var server_cur ={mainport:'',tomcatpaths:[{contextpath:"",docbase:""}],tomcat:{},jdk:{}};
 	var serverid = $.getUrlParam('id');
 	var jdks =[];
 	var tomcats =[];
@@ -116,7 +116,6 @@ $(function(){
 			    function (json) {
 					server_cur = json.retObj;
 			});
-	console.log(server_cur);
 	$.getJSON("/system/getJdks.json",
 	    function (json) {
 			jdks = json;
@@ -137,6 +136,12 @@ $(function(){
 		  server:server_cur,
 		  tomcat:tomcats,"jdk":jdks
 		  
+	  },
+	  computed:{
+		  aashutport:function(){
+			  this.server.shutport=parseInt(this.server.mainport)+10000;
+			  return this.server.shutport;
+		  }
 	  },
 	  methods: {
 			  cancel:function(idx){
