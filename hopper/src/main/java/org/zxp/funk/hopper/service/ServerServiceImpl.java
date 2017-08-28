@@ -4,14 +4,21 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zxp.funk.hopper.entity.ServerStatus;
-import org.zxp.funk.hopper.jpa.model.OperationType;
-import org.zxp.funk.hopper.jpa.model.ServerOperation;
-import org.zxp.funk.hopper.jpa.model.TomcatServer;
+import org.zxp.funk.hopper.jpa.dao.CustomDao;
+import org.zxp.funk.hopper.jpa.entity.OperationType;
+import org.zxp.funk.hopper.jpa.entity.ServerOperation;
+import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.jpa.repository.ServerOperationRepository;
 import org.zxp.funk.hopper.jpa.repository.TomcatServerRepository;
+import org.zxp.funk.hopper.jpa.entity.ServerOperationExt;
+import org.zxp.funk.hopper.pojo.OperationLog;
+import org.zxp.funk.hopper.pojo.ServerStatus;
 
 @Service
 public class ServerServiceImpl implements ServerService {
@@ -27,16 +34,19 @@ public class ServerServiceImpl implements ServerService {
 	
 	@Autowired
 	private ServerOperationRepository operationRep;
+	
+	@Autowired
+	private CustomDao operdao;
 
 	@Override
-	public void startup(String id) throws Exception {
+	public void startup(String id,String operator) throws Exception {
 		
-		serverlist.startup(id);
+		serverlist.startup(id,  operator);
 	}
 
 	@Override
-	public void shutdown(String id) throws Exception{
-		serverlist.shutdown(id);
+	public void shutdown(String id,String operator) throws Exception{
+		serverlist.shutdown(id, operator);
 	}
 
 	@Override
@@ -51,7 +61,7 @@ public class ServerServiceImpl implements ServerService {
 	}
 
 	@Override@Transactional
-	public TomcatServer addServer(TomcatServer sc) throws Exception {
+	public TomcatServer addServer(TomcatServer sc,String operator) throws Exception {
 		boolean isNew = sc.getServerid()==null||sc.getServerid().isEmpty();
 		Date createtime=new Date();
 		sc.setOperations(sc.getOperations()+1);
@@ -64,7 +74,7 @@ public class ServerServiceImpl implements ServerService {
 			so.setOperationtype(OperationType.新建);
 		else
 			so.setOperationtype(OperationType.修改);
-		so.setOperator("管理员");
+		so.setOperator(operator);
 		so.setOperationtime(createtime);
 		operationRep.save(so);
 		serverlist.add(sc);
@@ -87,4 +97,36 @@ public class ServerServiceImpl implements ServerService {
 		serverlist.remove(serverrep.findOne(id));
 		serverrep.delete(id);
 	}
+	
+	
+	
+	@Override
+	public Page<OperationLog> getOperationLogsByPage1(int pageCout, int pageno) {
+		Pageable pageable = new PageRequest(pageno,pageCout, Sort.Direction.DESC,"operationtime");
+		Page<OperationLog> page =  operationRep.findOperationLogsByPage(pageable);
+		return page;
+		
+	}
+
+	@Override
+	public List<ServerOperationExt> getOperationsByPage(int pageCout, int pageno) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public List<OperationLog> getOperationLogsByPage2(int pageCout, int pageno) {
+		return operdao.getOperationsByPage(pageCout, pageno);
+	}
+
+	@Override
+	public List<OperationLog> getOperations() {
+		return operationRep.findOperation2All();
+	}
+	
+	@Override
+	public long getOperationCount(){
+		return operationRep.count();
+	}
+	
 }

@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.entity;
+package org.zxp.funk.hopper.pojo;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

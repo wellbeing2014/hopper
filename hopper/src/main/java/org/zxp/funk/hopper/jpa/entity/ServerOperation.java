@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.jpa.model;
+package org.zxp.funk.hopper.jpa.entity;
 
 
 import java.io.Serializable;
@@ -10,9 +10,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.print.attribute.standard.DateTimeAtCompleted;
 
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
  
 @Entity
 @Table(name="OPERATION")
@@ -36,7 +37,10 @@ public class ServerOperation implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private OperationType operationtype;
 	private String operator;
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")  
 	private Date operationtime;
+	
+	
 	public String getOperationid() {
 		return operationid;
 	}

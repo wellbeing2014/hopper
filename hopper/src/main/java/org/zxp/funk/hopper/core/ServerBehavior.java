@@ -3,14 +3,15 @@ package org.zxp.funk.hopper.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.zxp.funk.hopper.entity.ServerStatus;
-import org.zxp.funk.hopper.jpa.model.ServerOperation;
-import org.zxp.funk.hopper.jpa.model.TomcatPath;
-import org.zxp.funk.hopper.jpa.model.TomcatServer;
+import org.zxp.funk.hopper.jpa.entity.ServerOperation;
+import org.zxp.funk.hopper.jpa.entity.TomcatPath;
+import org.zxp.funk.hopper.jpa.entity.TomcatServer;
+import org.zxp.funk.hopper.pojo.ServerStatus;
 import org.zxp.funk.hopper.utils.XmlUtil;
 
 import com.google.common.io.Files;
@@ -56,8 +57,9 @@ public class ServerBehavior {
 		tomcatBaseInit();
 	}
 	
-	public void addOnceOpr(){
+	public void addOnceOpr(Date datetime){
 		status.setOpr(status.getOpr()+1);
+		status.setLasttime(datetime);
 	}
 	
 	public void addTomcatLogEventListener(TomcatLogEventListener listener){

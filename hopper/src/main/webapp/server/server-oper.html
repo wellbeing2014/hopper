@@ -1,0 +1,65 @@
+﻿<!--#include virtual="/pub/_meta.shtml" -->  
+<title>操作日志</title>
+</head>
+<body>
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页 <span class="c-gray en">&gt;</span> 系统管理 <span class="c-gray en">&gt;</span>操作日志 <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" href="javascript:location.replace(location.href);" title="刷新" ><i class="Hui-iconfont">&#xe68f;</i></a></nav>
+
+
+<div class="page-container">
+	
+	<table class="table table-border table-bordered table-hover table-bg">
+		
+		<thead>
+			<tr class="text-c">
+				<th width="100">时间</th>
+				<th width="100">记录IP</th>
+				<th width="50">操作类型</th>
+				<th width="200">操作对象</th>
+			</tr>
+		</thead>
+		<tbody id="operbody">
+		
+		<tr class="text-c" v-for="oper in opers">
+			<td>{{oper.operationtime}}</td>
+			<td>{{oper.operator}}</td>
+			<td>{{oper.operationtype}}</td>
+			<td>{{oper.servername}}</td>
+		</tr>
+		</tbody>
+	</table>
+	<div id="demo6" class="mt-10"></div>
+</div>
+<!--#include virtual="/pub/_footer.shtml" -->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="/hopper-res/lib/vue/vue.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript" src="/hopper-res/lib/datatables/1.10.0/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+
+var app = new Vue({
+	  el: '#operbody',
+	  data: {
+		  opers:[]
+	  }
+});
+var pagecount = 20;
+$.getJSON('/server/allopers.json', {pageno: 0,pagecount:pagecount}, function(res){ //从第6页开始请求。返回的json格式可以任意定义
+	laypage({
+		cont: 'demo6', //容器。值支持id名、原生dom对象，jquery对象。【如该容器为】：&lt;div id="page1">&lt;/div>
+        pages: res.pages, //通过后台拿到的总页数
+        curr: 0, //初始化当前页
+        jump: function(e){ //触发分页后的回调
+            $.getJSON('/server/allopers.json', {pageno: e.curr-1,pagecount:pagecount}, function(res){
+                app.opers = res.retObj;
+            });
+        }
+    });
+});
+    
+
+
+</script>
+</body>
+</html>

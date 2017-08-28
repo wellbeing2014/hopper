@@ -3,7 +3,7 @@ package org.zxp.funk.hopper.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zxp.funk.hopper.jpa.model.User;
+import org.zxp.funk.hopper.jpa.entity.User;
 import org.zxp.funk.hopper.jpa.repository.UserRepository;
 
 @Service

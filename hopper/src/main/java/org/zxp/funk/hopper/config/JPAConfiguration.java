@@ -127,7 +127,7 @@ public class JPAConfiguration {
 	@Value("${hibernate.format_sql}")
 	boolean hibernate_format_sql;
 	
-	@Bean(name={"sessionFactory"})
+	/*@Bean(name={"sessionFactory"})
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource());
@@ -138,14 +138,15 @@ public class JPAConfiguration {
         properties.put("hibernate.format_sql", hibernate_format_sql);
         sessionFactory.setHibernateProperties(properties);
         return sessionFactory;
-     }
+        
+     }*/
     
-	 @Bean
+	 @Bean(name={"entityManagerFactory"})
      public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
          LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
          entityManagerFactoryBean.setDataSource(dataSource());
          entityManagerFactoryBean.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-         entityManagerFactoryBean.setPackagesToScan(new String[] { "org.zxp.funk.hopper.jpa.model" });
+         entityManagerFactoryBean.setPackagesToScan(new String[] { "org.zxp.funk.hopper.jpa.entity" });
          Properties properties = new Properties();
          properties.put("hibernate.dialect", hibernate_dialect);
          properties.put("hibernate.show_sql", hibernate_show_sql);

@@ -8,7 +8,7 @@ import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.zxp.funk.hopper.entity.ServerStatus;
+import org.zxp.funk.hopper.pojo.ServerStatus;
 
 @Controller
 @RequestMapping({""})

@@ -20,14 +20,14 @@ import org.zxp.funk.hopper.core.TomcatLogEventListener;
 import org.zxp.funk.hopper.core.TomcatLogEventObject;
 import org.zxp.funk.hopper.core.TomcatStatusEventListener;
 import org.zxp.funk.hopper.core.TomcatStatusEventObject;
-import org.zxp.funk.hopper.entity.ServerStatus;
-import org.zxp.funk.hopper.jpa.model.OperationType;
-import org.zxp.funk.hopper.jpa.model.ServerOperation;
-import org.zxp.funk.hopper.jpa.model.TomcatServer;
+import org.zxp.funk.hopper.jpa.entity.OperationType;
+import org.zxp.funk.hopper.jpa.entity.ServerOperation;
+import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.jpa.repository.JdkConfigRepository;
 import org.zxp.funk.hopper.jpa.repository.ServerConfigRepository;
 import org.zxp.funk.hopper.jpa.repository.ServerOperationRepository;
 import org.zxp.funk.hopper.jpa.repository.TomcatServerRepository;
+import org.zxp.funk.hopper.pojo.ServerStatus;
 
 import com.google.common.base.Strings;
 
@@ -124,17 +124,15 @@ public class ServerList {
 		}
 		if(Strings.isNullOrEmpty(server.getTomcat().getPath()))
 			server.setTomcat(scRep.findOne(server.getTomcat().getId()));
-		boolean isEdit = false;
 		for(ServerBehavior sb_d:list){
 			if(sb_d.server.getServerid().equals(server.getServerid())){
 				sb_d.tomcatBaseDelete();
 				list.remove(sb_d);
-				isEdit = true;
 			}
 		}
 		ServerBehavior sb  =new ServerBehavior(server,serverConfigDir);
 	
-		sb.addOnceOpr();
+		sb.addOnceOpr(server.getLasttime());
 		
 		sb.addTomcatLogEventListener(new TomcatLogEventListener() {
 			@Override
@@ -177,7 +175,7 @@ public class ServerList {
 		brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
 		return true;
 	}
-	public void startup(String id) throws Exception{
+	public void startup(String id,String operator) throws Exception{
 		
 		ServerBehavior serverb= null;
 		for(ServerBehavior sb:list){
@@ -194,15 +192,15 @@ public class ServerList {
 		ServerOperation so = new ServerOperation(serverb.server.getServerid());
 		so.setOperationtime(oprtime);
 		so.setOperationtype(OperationType.启动);
-		so.setOperator("启动者");
+		so.setOperator(operator);
 		operationRep.save(so);
 		serverRep.save(serverb.server);
-		serverb.addOnceOpr();
+		serverb.addOnceOpr(oprtime);
 		flush();
 		serverb.startup();
 	}
 	
-	public void shutdown(String id) throws Exception{
+	public void shutdown(String id,String operator) throws Exception{
 		
 		ServerBehavior serverb= null;
 		for(ServerBehavior sb:list){
@@ -219,10 +217,10 @@ public class ServerList {
 		ServerOperation so = new ServerOperation(serverb.server.getServerid());
 		so.setOperationtime(oprtime);
 		so.setOperationtype(OperationType.停止);
-		so.setOperator("停止者");
+		so.setOperator(operator);
 		operationRep.save(so);
 		serverRep.save(serverb.server);
-		serverb.addOnceOpr();
+		serverb.addOnceOpr(oprtime);
 		flush();
 		serverb.shutdown();
 		

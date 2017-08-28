@@ -2,8 +2,8 @@ package org.zxp.funk.hopper.service;
 
 import java.util.List;
 
-import org.zxp.funk.hopper.jpa.model.JdkConfig;
-import org.zxp.funk.hopper.jpa.model.ServerConfig;
+import org.zxp.funk.hopper.jpa.entity.JdkConfig;
+import org.zxp.funk.hopper.jpa.entity.ServerConfig;
 
 public interface SystemService {
 	public void addTomcat(ServerConfig server);

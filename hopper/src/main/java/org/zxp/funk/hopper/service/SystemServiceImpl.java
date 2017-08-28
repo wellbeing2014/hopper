@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zxp.funk.hopper.jpa.model.JdkConfig;
-import org.zxp.funk.hopper.jpa.model.ServerConfig;
+import org.zxp.funk.hopper.jpa.entity.JdkConfig;
+import org.zxp.funk.hopper.jpa.entity.ServerConfig;
 import org.zxp.funk.hopper.jpa.repository.JdkConfigRepository;
 import org.zxp.funk.hopper.jpa.repository.ServerConfigRepository;
 

@@ -1,4 +1,4 @@
-package org.zxp.funk.hopper.jpa.model;
+package org.zxp.funk.hopper.jpa.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

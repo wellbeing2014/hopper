@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.zxp.funk.hopper.jpa.model.User;
+import org.zxp.funk.hopper.jpa.entity.User;
 import org.zxp.funk.hopper.service.UserService;
 
 @Controller

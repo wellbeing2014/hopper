@@ -5,7 +5,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
-import org.springframework.orm.hibernate5.support.OpenSessionInViewFilter;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -33,7 +33,7 @@ public class MainWebInitializer implements WebApplicationInitializer {
 	    druidfilter.addMappingForServletNames(null, true, "druidServlet");
 	    druidfilter.setInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
 	    //解决hibernate 延迟加载的问题
-	    FilterRegistration.Dynamic filter = servletContext.addFilter("openSessionInViewFilter", OpenSessionInViewFilter.class);
+	    FilterRegistration.Dynamic filter = servletContext.addFilter("openEntityManagerInViewFilter", OpenEntityManagerInViewFilter.class);
 	    filter.addMappingForServletNames(null, true, "dispatcher");
 	    filter.setInitParameter("flushMode","AUTO");
 	    servletContext.addListener(new ContextLoaderListener(rootContext));

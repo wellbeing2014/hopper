@@ -3,6 +3,7 @@ package org.zxp.funk.hopper.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.zxp.funk.hopper.core.HopperException;
-import org.zxp.funk.hopper.jpa.model.TomcatServer;
+import org.zxp.funk.hopper.jpa.entity.TomcatServer;
+import org.zxp.funk.hopper.pojo.OperationLog;
 import org.zxp.funk.hopper.service.ServerService;
 import org.zxp.funk.hopper.utils.WebUtil;
 @Controller
@@ -23,8 +25,6 @@ public class ServerController {
 	
 	@Autowired
 	private  WebUtil webutil;
-	
-	
 	/**
 	 * @Title: 服务列表页
 	 * @Description: TODO
@@ -79,7 +79,7 @@ public class ServerController {
 	
 	/**
 	 * @Title: 返回所有服务的状态
-	 * @Description: TODO
+	 * @Description: 
 	 * @return
 	 * @return: HopperBaseReturn
 	 */
@@ -101,16 +101,18 @@ public class ServerController {
 		return ret;
 	}
 	
+	
+	
 	/**
 	 * @Title: 添加一个服务
-	 * @Description: TODO
+	 * @Description: 添加服务
 	 * @param name
 	 * @param path
 	 * @param plat
 	 * @param id
 	 * @param args
 	 * @return
-	 * @return: Map<String,String>
+	 * @return: HopperBaseReturn
 	 */
 	@RequestMapping(value="add.json", method = RequestMethod.POST)
 	@ResponseBody
@@ -118,7 +120,8 @@ public class ServerController {
 		HopperBaseReturn ret = new HopperBaseReturn();
 		boolean isNew = server.getServerid()==null||server.getServerid().isEmpty();
 		try{
-			TomcatServer saved = ss.addServer(server);
+			String ip = webutil.getClientIp() ;
+			TomcatServer saved = ss.addServer(server,ip);
 			ret.setSuccess(true);
 			ret.setRetId(saved.getServerid());
 			if (isNew)
@@ -165,7 +168,7 @@ public class ServerController {
 	
 	/**
 	 * @Title: 操作类
-	 * @Description: TODO
+	 * @Description: 对服务进行起停操作
 	 * @param id
 	 * @param type 1：启动 2：关闭
 	 * @return
@@ -176,17 +179,17 @@ public class ServerController {
 	public HopperBaseReturn operate(
 										@RequestParam("id") String id, 
 										@RequestParam(value="type") int type){
-		System.out.println(webutil.getClientIp());
+		String ip = webutil.getClientIp() ;
 		HopperBaseReturn ret = new HopperBaseReturn();
 		ret.setRetId(id);
 		try{
 			switch(type)
 			{
 			case 1:
-				ss.startup(id);
+				ss.startup(id,ip);
 				break;
 			case 2:
-				ss.shutdown(id);
+				ss.shutdown(id,ip);
 				break;
 			default:
 				throw new Exception("未知命令");
@@ -202,6 +205,63 @@ public class ServerController {
 		return ret;
 	}
 	
+	@RequestMapping({"allopers.json"})
+	@ResponseBody
+	public HopperBaseReturn getAllOperations1(@RequestParam(value="pageno") int pageno,@RequestParam(value="pagecount") int pagecount)
+	{
+		HopperPageReturn ret = new HopperPageReturn();
+		try{
+			Page<OperationLog> page = ss.getOperationLogsByPage1(pagecount,pageno);
+			ret.setSuccess(true);
+			ret.setRetObj(page.getContent());
+			ret.setCount(page.getTotalElements());
+			ret.setCountPer(page.getSize());
+			ret.setPages(page.getTotalPages());
+			ret.setMsg("所有操作返回成功");
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，服务未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("查询历史操作错误!",e);
+		}
+		return ret;
+	}
 	
+	@RequestMapping({"allopers2.json"})
+	@ResponseBody
+	public HopperBaseReturn getAllOperations2(@RequestParam(value="pageno") int pageno,@RequestParam(value="pagecount") int pagecount)
+	{
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			ret.setSuccess(true);
+			ret.setRetObj(ss.getOperationLogsByPage2(pagecount,pageno));
+			ret.setMsg("所有操作返回成功");
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，服务未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("查询历史操作错误!",e);
+		}
+		return ret;
+	}
+	
+	
+	@RequestMapping({"allopers3.json"})
+	@ResponseBody
+	public HopperBaseReturn getAllOperations3()
+	{
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			ret.setSuccess(true);
+			ret.setRetObj(ss.getOperations());
+			ret.setMsg("所有操作返回成功");
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，服务未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("查询历史操作错误!",e);
+		}
+		return ret;
+	}
 }
 

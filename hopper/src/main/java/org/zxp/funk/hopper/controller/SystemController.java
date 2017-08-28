@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.zxp.funk.hopper.jpa.model.JdkConfig;
-import org.zxp.funk.hopper.jpa.model.ServerConfig;
+import org.zxp.funk.hopper.jpa.entity.JdkConfig;
+import org.zxp.funk.hopper.jpa.entity.ServerConfig;
 import org.zxp.funk.hopper.service.SystemService;
 
 @Controller
@@ -26,7 +26,6 @@ public class SystemController {
 	
 	@Autowired
 	SystemService sysService;
-	
 	
 	@RequestMapping({""})
 	public String index()
