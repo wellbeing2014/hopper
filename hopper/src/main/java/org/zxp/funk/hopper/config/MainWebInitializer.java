@@ -29,6 +29,7 @@ public class MainWebInitializer implements WebApplicationInitializer {
 	    ServletRegistration.Dynamic druidServlet = servletContext.addServlet("druidServlet", new StatViewServlet());
 	    druidServlet.addMapping("/druid/*");
 	    
+	    
 	    FilterRegistration.Dynamic druidfilter = servletContext.addFilter("druid",new WebStatFilter());
 	    druidfilter.addMappingForServletNames(null, true, "druidServlet");
 	    druidfilter.setInitParameter("exclusions", "*.js,*.gif,*.jpg,*.png,*.css,*.ico,/druid/*");
@@ -36,6 +37,7 @@ public class MainWebInitializer implements WebApplicationInitializer {
 	    FilterRegistration.Dynamic filter = servletContext.addFilter("openEntityManagerInViewFilter", OpenEntityManagerInViewFilter.class);
 	    filter.addMappingForServletNames(null, true, "dispatcher");
 	    filter.setInitParameter("flushMode","AUTO");
+	    
 	    servletContext.addListener(new ContextLoaderListener(rootContext));
 	}
 }

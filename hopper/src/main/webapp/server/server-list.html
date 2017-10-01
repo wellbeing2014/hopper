@@ -229,7 +229,7 @@ function html_encode(str)
 {  
     var s = "";  
     if (str.length == 0) return "";  
-    s = str.replace(/&/g, ">");  
+    s = str.replace(/&/g, "&");  
     s = s.replace(/</g, "<");  
     s = s.replace(/>/g, ">");  
     s = s.replace(/ /g, " ");  
