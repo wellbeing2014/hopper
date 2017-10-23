@@ -24,7 +24,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;  
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;  
   
 
 /**
@@ -40,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-		    .antMatchers("/assets/**","/hopper-res/**","/version.json").permitAll()
+		    .antMatchers("/assets/**","/hopper-res/**","/jq/**","/hopper-jq/**","/version.json").permitAll()
 		    .anyRequest().authenticated()
 		    .and()
 		    	.addFilterAt(myUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).exceptionHandling()
@@ -104,7 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 			@Override
 			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 					Authentication authentication) throws IOException, ServletException {
-			   request.getSession().setMaxInactiveInterval(10*60);//设置session过期时间
+			   request.getSession().setMaxInactiveInterval(100*60);//设置session过期时间
 			   //String url = super.determineTargetUrl(request, response);
 			   String url ="/new/index_iframe.html";
 			   response.setCharacterEncoding("UTF-8");  

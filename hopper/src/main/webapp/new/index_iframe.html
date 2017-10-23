@@ -860,7 +860,13 @@ License: You must have a valid license purchased only from themeforest(the above
             	
             }
             function resizeIframe(obj) {
-                obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+            	var containerheight =$('.page-content').height();
+            	var iframeheight=obj.contentWindow.document.body.scrollHeight;
+            	//console.log(containerheight +"||"+iframeheight);
+            	//if(containerheight>iframeheight)
+                	$(obj).height(containerheight-5);
+            	//else
+            	//	$(obj).height(iframeheight);
             }
         </script>
     </body>

@@ -47,7 +47,7 @@ public class MyChannelInterceptor extends ChannelInterceptorAdapter {
         super.afterSendCompletion(message, channel, sent, ex);
         if (StompCommand.SUBSCRIBE.equals(command)){
             
-
+        	
         }
     }
 

@@ -1,0 +1,63 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h4 class="modal-title">服务编辑</h4>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <form role="form" action="#" class="form-horizontal">
+               <div class="form-group">
+                   <label class="col-md-3 control-label">主端口</label>
+                   <div class="col-md-3">
+                       <input type="text" placeholder="8080" class="form-control" /> </div>
+                   <label class="col-md-3 control-label">停端口</label>
+               		<div class="col-md-3">
+                   <input type="text" placeholder="8009" class="form-control" /> </div>
+               </div>
+               
+               <div class="form-group">
+                   <label class="col-md-3 control-label">服务名称</label>
+                   <div class="col-md-9">
+                       <input type="text" placeholder="服务名称" class="form-control" /> </div>
+                   <br> </div>
+               <div class="form-group">
+                   <label class="col-md-3 control-label">上下文路径</label>
+                   <div class="col-md-9">
+                       <div class="mt-repeater">
+                           <div data-repeater-list="group-b">
+                               <div data-repeater-item class="row">
+                                   <div class="col-md-7">
+                                       <label class="control-label">DOCBASE</label>
+                                       <input type="text" placeholder="D:/webapps" class="form-control" /> </div>
+                                   <div class="col-md-3">
+                                       <label class="control-label">PATH</label>
+                                       <input type="text" placeholder="/app" class="form-control" /> </div>
+                                   <div class="col-md-1">
+                                       <a href="javascript:;" data-repeater-delete class="btn btn-danger">
+                                           <i class="fa fa-close"></i>
+                                       </a>
+                                   </div>
+                               </div>
+                           </div>
+                           <hr>
+                           <a href="javascript:;" data-repeater-create class="btn btn-info mt-repeater-add">
+                               <i class="fa fa-plus"></i> 添加上下文</a>
+                           <br>
+                           <br> </div>
+                   </div>
+               </div>
+               
+               <div class="form-group">
+                   <label class="col-md-3 control-label">备注</label>
+                   <div class="col-md-9">
+                       <textarea class="form-control" rows="3" placeholder="添加备注"></textarea>
+                   </div>
+               </div>
+           </form>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn default" data-dismiss="modal">取消</button>
+    <button type="button" class="btn blue update">保存</button>
+</div>

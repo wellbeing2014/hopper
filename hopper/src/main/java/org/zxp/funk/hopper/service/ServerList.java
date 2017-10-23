@@ -32,7 +32,6 @@ import org.zxp.funk.hopper.pojo.ServerStatus;
 import com.google.common.base.Strings;
 
 @Component
-@Scope("singleton")
 public class ServerList {
 	private static Logger logger=LoggerFactory.getLogger("核心服务列表");
 	private   ConcurrentLinkedQueue<ServerBehavior> list = new ConcurrentLinkedQueue<ServerBehavior>();

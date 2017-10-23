@@ -7,14 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.zxp.funk.hopper.config.MyUserDetails;
-import org.zxp.funk.hopper.pojo.ServerStatus;
 
 @Controller
 @RequestMapping({""})
