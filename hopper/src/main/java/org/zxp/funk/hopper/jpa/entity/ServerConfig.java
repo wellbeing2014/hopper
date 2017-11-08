@@ -128,7 +128,7 @@ public class ServerConfig implements Serializable {
         if (!(obj instanceof ServerConfig))
             return false;
         ServerConfig other = (ServerConfig) obj;
-        if (id != other.id)
+        if (!id.equals(other.id) )
             return false;
         return true;
     }

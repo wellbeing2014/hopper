@@ -12,12 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Scope;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.zxp.funk.hopper.core.ServerBehavior;
 import org.zxp.funk.hopper.core.TomcatLogEventListener;
 import org.zxp.funk.hopper.core.TomcatLogEventObject;
+import org.zxp.funk.hopper.core.TomcatStatus;
 import org.zxp.funk.hopper.core.TomcatStatusEventListener;
 import org.zxp.funk.hopper.core.TomcatStatusEventObject;
 import org.zxp.funk.hopper.jpa.entity.OperationType;
@@ -130,9 +130,6 @@ public class ServerList {
 			}
 		}
 		ServerBehavior sb  =new ServerBehavior(server,serverConfigDir);
-	
-		sb.addOnceOpr(server.getLasttime());
-		
 		sb.addTomcatLogEventListener(new TomcatLogEventListener() {
 			@Override
 			public void logEvent(TomcatLogEventObject obj) {
@@ -147,13 +144,71 @@ public class ServerList {
 				
 			}
 		});
+		serverRep.save(server);
 		list.add(sb);
 		flush();
 		brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
 		
-		serverRep.save(sb.server);
 		return true;
 	}
+	
+	
+	/**
+	 * @param server
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean update(TomcatServer server) throws Exception{
+		
+		ServerBehavior update_o = null;
+		for(ServerBehavior sb_d:list){
+			if(sb_d.server.getServerid().equals(server.getServerid())){
+				update_o = sb_d;
+			}
+		}
+		if(update_o.server.isCoreEdit(server))
+		{
+			
+			while(update_o.getExecutor().isRunning()) {
+				logger.info(update_o.server.getServername()+"-等待停止");
+				update_o.shutdown();
+				Thread.sleep(1500);
+				
+			}
+			update_o.tomcatBaseInit();
+		}
+		update_o.resetServerStatus(server);
+		serverRep.save(server);
+		flush();
+		brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
+		return true;
+	}
+	
+	public void shutdownForce(String id,String operator) throws Exception{
+		
+		ServerBehavior serverb= null;
+		for(ServerBehavior sb:list){
+			if(sb.server.getServerid().equals(id)){
+				serverb = sb;
+				break;
+			}
+		}
+		if(serverb==null) throw new Exception("未找到相应服务："+id);
+		
+		Date oprtime = new Date();
+		serverb.server.setOperations(serverb.server.getOperations()+1);
+		serverb.server.setLasttime(oprtime);
+		ServerOperation so = new ServerOperation(serverb.server.getServerid());
+		so.setOperationtime(oprtime);
+		so.setOperationtype(OperationType.停止);
+		so.setOperator(operator);
+		serverb.shutdownForce();
+		operationRep.save(so);
+		serverRep.save(serverb.server);
+		serverb.addOnceOpr(oprtime);
+		flush();
+	}
+	
 	
 	/**
 	 * @Title: remove

@@ -8,13 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.GenericGenerator;
-import org.zxp.funk.hopper.utils.Platform;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
  
 @Entity
 @Table(name="conf_jdks")
@@ -100,7 +96,7 @@ public class JdkConfig implements Serializable {
         if (!(obj instanceof JdkConfig))
             return false;
         JdkConfig other = (JdkConfig) obj;
-        if (id != other.id)
+        if (!id.equals( other.getId()))
             return false;
         return true;
     }

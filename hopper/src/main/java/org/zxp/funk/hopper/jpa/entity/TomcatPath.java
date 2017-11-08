@@ -16,6 +16,13 @@ public class TomcatPath{
 	private String pathid;
 	private String docbase;
 	private String contextpath;
+	
+	public String getPathid() {
+		return pathid;
+	}
+	public void setPathid(String pathid) {
+		this.pathid = pathid;
+	}
 	public String getDocbase() {
 		return docbase;
 	}
@@ -31,5 +38,24 @@ public class TomcatPath{
 	
 	public String toString(){
 		return "{'docbase':'"+this.docbase+"','contextpath':'"+this.contextpath+"'}";
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof TomcatPath))
+            return false;
+        TomcatPath other = (TomcatPath) obj;
+
+        if (pathid!=null&&!pathid.equals( other.getPathid()))
+            return false;
+        if (docbase!=null&&!docbase.equals( other.getDocbase()))
+            return false;
+        if (contextpath!=null&&!contextpath.equals( other.getContextpath()))
+            return false;
+        return true;
 	}
 }

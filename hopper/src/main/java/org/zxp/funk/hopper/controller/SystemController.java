@@ -1,9 +1,5 @@
 package org.zxp.funk.hopper.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -50,61 +46,100 @@ public class SystemController {
 	
 	@RequestMapping(value="add.json", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,String> addTomcat(HttpServletRequest req, 
-										@RequestParam("servername") String name, 
-										@RequestParam("localpath") String path, 
-										@RequestParam("platform") int plat, 
-										@RequestParam(value="sid", required=false) String id,
+	public HopperBaseReturn addTomcat(HttpServletRequest req, 
+										@RequestParam("name") String name, 
+										@RequestParam("path") String path, 
+										@RequestParam("plat") int plat, 
+										@RequestParam(value="id", required=false) String id,
 										@RequestParam(value="args", required=false) String args){
-		ServerConfig sc = new ServerConfig();
-		sc.setId(id);
-		sc.setName(name);
-		sc.setPath(path);
-		sc.setArgs(args);
-		sc.setPlat(plat);
-		sysService.addTomcat(sc);
-		Map<String,String> ret = new HashMap<String,String>();
-		ret.put("aaa", "bbb");
+		
+		
+		
+		HopperBaseReturn ret = new HopperBaseReturn();
+		ret.setRetId(id);
+		try{
+			ServerConfig sc = new ServerConfig();
+			sc.setId(id);
+			sc.setName(name);
+			sc.setPath(path);
+			sc.setArgs(args);
+			sc.setPlat(plat);
+			
+			sc = sysService.addTomcat(sc);;
+			ret.setRetObj(sc);
+			ret.setRetId(sc.getId());
+			ret.setSuccess(true);
+			ret.setMsg("保存成功");
+		}
+		catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("保存失败");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("保存tomcat失败："+e.getMessage());
+		}
 		return ret;
+		
 	}
 	
-	@RequestMapping(value="test.json", method = RequestMethod.POST)
-	@ResponseBody
-	public Map<String,String> delTomcat1(HttpServletRequest req, @RequestParam("fileName") String id)
-	{
-		Map<String,String> ret = new HashMap<String,String>();
-		ret.put("aaa", "bbb");
-		return ret;
-	}
+	
 	
 	@RequestMapping(value="delServer.json", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,String> delTomcat(HttpServletRequest req, @RequestParam("id") String id)
+	public HopperBaseReturn delTomcat(HttpServletRequest req, @RequestParam("id") String id)
 	{
-		sysService.delTomcat(id);
-		Map<String,String> ret = new HashMap<String,String>();
-		ret.put("aaa", "bbb");
+		HopperBaseReturn ret = new HopperBaseReturn();
+		ret.setRetId(id);
+		try{
+			ret.setSuccess(true);
+			sysService.delTomcat(id);
+			ret.setMsg("删除成功");
+			
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("删除失败");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("删除tomcat失败："+e.getMessage());
+		}
 		return ret;
 	}
 	
 	@RequestMapping(value="getTomcats.json", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ServerConfig> findAllServerConfig()
+	public HopperBaseReturn findAllServerConfig()
 	{
-		return sysService.findAllTomcat();
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			ret.setSuccess(true);
+			ret.setRetObj(sysService.findAllTomcat());
+			ret.setMsg("获取所有tomcat");
+			
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("获取tomcat错误："+e.getMessage());
+		}
+		return ret;
+		
 	}
 	
 	@RequestMapping(value="getaTomcat.json", method = RequestMethod.GET)
 	@ResponseBody
-	public ServerConfig findOneServerConfig(String id)
+	public HopperBaseReturn findOneServerConfig(String id)
 	{
-		return sysService.findOneTomcat(id);
+		HopperBaseReturn ret = new HopperBaseReturn();
+		ret.setRetId(id);
+		ret.setRetObj(sysService.findOneTomcat(id));
+		ret.setMsg("获取成功");
+		ret.setSuccess(true);
+		return ret;
 	}
 	
 	@RequestMapping(value="addJdk.json", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,String> addJdk(String jdkname,String id,String classpath,String remark,String javahome){
-		Map<String,String> ret = new HashMap<String,String>();
+	public HopperBaseReturn addJdk(String jdkname,String id,String classpath,String remark,String javahome){
+		HopperBaseReturn ret = new HopperBaseReturn();
+		ret.setRetId(id);
 		try{
 			JdkConfig jdk = new JdkConfig();
 			jdk.setId(id);
@@ -112,45 +147,65 @@ public class SystemController {
 			jdk.setJavahome(javahome);
 			jdk.setJdkname(jdkname);
 			jdk.setRemark(remark);
-			sysService.addJdk(jdk);
-			ret.put("msg", "保存成功！");
-			ret.put("code", "0");
+			
+			jdk = sysService.addJdk(jdk);
+			ret.setRetObj(jdk);
+			ret.setRetId(jdk.getId());
+			ret.setSuccess(true);
+			ret.setMsg("保存成功");
 		}
 		catch(Exception e){
-			ret.put("code", "1");
-			ret.put("msg", "保存失败！");
-			ret.put("err", e.getMessage());
+			ret.setSuccess(false);
+			ret.setMsg("保存失败");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("保存JDK失败："+e.getMessage());
 		}
-		
-		
 		return ret;
 	}
 	
 	@RequestMapping(value="delJdk.json", method = RequestMethod.POST)
 	@ResponseBody
-	public Map<String,String> delJdk(@RequestParam("id") String id)
+	public HopperBaseReturn delJdk(@RequestParam("id") String id)
 	{
-		
-		Map<String,String> ret = new HashMap<String,String>();
-		
+		HopperBaseReturn ret = new HopperBaseReturn();
+		ret.setRetId(id);
 		try{
+			ret.setSuccess(true);
 			sysService.delJdk(id);
-			ret.put("msg", "删除成功！");
-			ret.put("code", "0");
-		}
-		catch(Exception e){
-			ret.put("code", "1");
-			ret.put("msg", "删除失败！");
-			ret.put("err", e.getMessage());
+			ret.setMsg("删除成功");
+			
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("删除失败");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("删除JDK失败："+e.getMessage());
 		}
 		return ret;
+		
 	}
 	
+	/**
+	 * 获取jdk
+	 * @return
+	 */
 	@RequestMapping(value="getJdks.json", method = RequestMethod.GET)
 	@ResponseBody
-	public List<JdkConfig> findAllJdks()
+	public HopperBaseReturn findAllJdks()
 	{
-		return sysService.findAllJdks();
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			ret.setSuccess(true);
+			ret.setRetObj(sysService.findAllJdks());
+			ret.setMsg("获取所有jdk");
+			
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("获取服务错误："+e.getMessage());
+		}
+		return ret;
+		
 	}
 	
 	

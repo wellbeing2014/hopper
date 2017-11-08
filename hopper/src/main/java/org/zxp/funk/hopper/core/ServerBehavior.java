@@ -2,16 +2,14 @@ package org.zxp.funk.hopper.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.zxp.funk.hopper.jpa.entity.ServerOperation;
 import org.zxp.funk.hopper.jpa.entity.TomcatPath;
 import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.pojo.ServerStatus;
+import org.zxp.funk.hopper.utils.IOUtil;
 import org.zxp.funk.hopper.utils.XmlUtil;
 
 import com.google.common.io.Files;
@@ -29,22 +27,10 @@ public class ServerBehavior {
 	
 	public ServerBehavior(TomcatServer instance,String confBaseDir) throws HopperException{
 		
-		this.server=instance;
-		this.confDir = confBaseDir+File.separator+this.server.getConfigDirName();
-		status.setServerid(server.getServerid());
-		status.setServername(server.getServername());
-		status.setStatus(currentStatus);
-		status.setMainport(server.getMainport());
-		status.setLoalpaths(server.getLoalPaths());
 		
-		status.setOpr(server.getOperations());
-		status.setMark(server.getDesc());
-		status.setLasttime(server.getLasttime());
 		executor = new TomcatExecutor();
-		executor.setTomcatHome(server.getTomcat().getPath());
-		executor.setTomcatBase(confDir);
-		executor.setJavaOpts(server.getOpts());
-		executor.setJavaHome(server.getJdk().getJavahome());
+		resetServerStatus(instance);
+		this.confDir = confBaseDir+File.separator+this.server.getConfigDirName();
 		this.executor.addTomcatStatusEventListener(new TomcatStatusEventListener() {
 			
 			@Override
@@ -55,6 +41,21 @@ public class ServerBehavior {
 		});
 		
 		tomcatBaseInit();
+	}
+	
+	public void resetServerStatus(TomcatServer instance) {
+		this.server=instance;
+		status.setServerid(server.getServerid());
+		status.setServername(server.getServername());
+		status.setStatus(currentStatus);
+		status.setMainport(server.getMainport());
+		status.setLoalpaths(server.getLoalPaths());
+		status.setOpr(server.getOperations());
+		status.setMark(server.getDesc());
+		status.setLasttime(server.getLasttime());
+		executor.setJavaOpts(server.getOpts());
+		executor.setJavaHome(server.getJdk().getJavahome());
+		
 	}
 	
 	public void addOnceOpr(Date datetime){
@@ -78,6 +79,12 @@ public class ServerBehavior {
 	public void shutdown() throws HopperException {
 		
 		executor.shutdown();
+	
+	}
+	
+	public void shutdownForce() throws HopperException {
+		
+		executor.getWatchdog().destroyProcess();
 	
 	}
 	
@@ -121,8 +128,8 @@ public class ServerBehavior {
 				Element context =XmlUtil.addElement(host,"Context");
 				context.setAttribute("path", path.getContextpath());
 				context.setAttribute("docBase", path.getDocbase());
-				context.setAttribute("debug", "0");
-				context.setAttribute("reloadable", "false");
+				//context.setAttribute("debug", "0");
+				//context.setAttribute("reloadable", "false");
 			}
 			
 			XmlUtil.saveDoc(doc, confDir+File.separator+TOMCAT_BASE_CONF_DIR+File.separator+"server.xml");
@@ -131,6 +138,9 @@ public class ServerBehavior {
 			throw new HopperException("01003","TOMCAT_BASE 解析配置错误："+e.getMessage());
 		}
         
+        executor.setTomcatHome(server.getTomcat().getPath());
+		executor.setTomcatBase(confDir);
+		
 	}
 	
 	
@@ -144,14 +154,7 @@ public class ServerBehavior {
 		
 		File tomcatbase = new File(confDir);
 		try {
-			java.nio.file.Files.walk(tomcatbase.toPath()).
-			sorted((a, b) -> b.compareTo(a)). // reverse; files before dirs
-			forEach(p -> {
-			     try {
-					java.nio.file.Files.delete(p);
-				} catch (IOException e) {
-				} 
-			  });
+			IOUtil.deleteDirectory(tomcatbase,true);
 		} catch (Exception e1) {
 			throw new HopperException("01004","TOMCAT_BASE 删除错误："+e1.getMessage());
 		}
@@ -181,6 +184,9 @@ public class ServerBehavior {
 		return this.executor;
 	}
 	
+	public TomcatStatus getCurrentStatus() {
+		return TomcatStatus.parse(currentStatus.toString());
+	}
 	public static void main(String[] arg){
 		
 		try {

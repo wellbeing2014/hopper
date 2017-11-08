@@ -1,5 +1,7 @@
 package org.zxp.funk.hopper.core;
 
+import org.zxp.funk.hopper.utils.Platform;
+
 public enum TomcatStatus {
 	STARTED("正在启动"),
 	RUNNING("运行中"),
@@ -15,5 +17,16 @@ public enum TomcatStatus {
 	public String toString() {
 		return this.status;
 	}
+	
+	 public static TomcatStatus parse(String status) {
+		 TomcatStatus plat = TomcatStatus.FORBIDDEN; // Default
+        for (TomcatStatus item : TomcatStatus.values()) {
+            if (item.toString().equals(status)) {
+            	plat = item;
+                break;
+            }
+        }
+        return plat;
+    }
 
 }

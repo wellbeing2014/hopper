@@ -14,7 +14,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -46,27 +45,10 @@ public class TomcatServer implements Serializable {
 	private int operations;
 	private Date lasttime;
 	
-	public Date getLasttime() {
-		return lasttime;
-	}
-	public void setLasttime(Date lasttime) {
-		this.lasttime = lasttime;
-	}
-	public int getOperations() {
-		return operations;
-	}
-	public void setOperations(int operations) {
-		this.operations = operations;
-	}
 	@OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER ,orphanRemoval=true)
 	@JoinColumn(name="server_id")
 	private List<TomcatPath> tomcatpaths;
-	public List<TomcatPath> getTomcatpaths() {
-		return tomcatpaths;
-	}
-	public void setTomcatpaths(List<TomcatPath> tomcatpaths) {
-		this.tomcatpaths = tomcatpaths;
-	}
+	
 	@Column(name="mark")
 	private String desc;
 	private String opts;
@@ -119,6 +101,26 @@ public class TomcatServer implements Serializable {
 	public void setOpts(String opts) {
 		this.opts = opts;
 	}
+
+	public Date getLasttime() {
+		return lasttime;
+	}
+	public void setLasttime(Date lasttime) {
+		this.lasttime = lasttime;
+	}
+	public int getOperations() {
+		return operations;
+	}
+	public void setOperations(int operations) {
+		this.operations = operations;
+	}
+	
+	public List<TomcatPath> getTomcatpaths() {
+		return tomcatpaths;
+	}
+	public void setTomcatpaths(List<TomcatPath> tomcatpaths) {
+		this.tomcatpaths = tomcatpaths;
+	}
 	
 	/**
 	 * @Title: getLoalPaths
@@ -151,6 +153,29 @@ public class TomcatServer implements Serializable {
 		return this.mainport+"_"+this.servername;
 	}
 	
+	/** 是否改动了核心
+	 * @param ts
+	 * @return
+	 */
+	public boolean isCoreEdit(TomcatServer ts) {
+		if(!this.getConfigDirName().equals(ts.getConfigDirName()))
+			return true;
+		if(this.shutport!=ts.getShutport())
+			return true;
+		if(!this.jdk.equals(ts.getJdk()))
+			return true;
+		if(!this.tomcat.equals(ts.getTomcat()))
+			return true;
+		if(this.tomcatpaths.size()==ts.getTomcatpaths().size()) {
+			for(int i = 0; i<this.tomcatpaths.size(); i++) {
+				if(!this.tomcatpaths.get(i).equals(ts.tomcatpaths.get(i)))
+					return true;
+			}
+			return false;
+		}
+		else return true;
+		
+	}
 	 
  
 }

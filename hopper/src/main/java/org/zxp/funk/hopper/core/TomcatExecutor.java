@@ -27,12 +27,32 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
 
     private Vector<TomcatStatusEventListener> statuseventlist=new Vector<TomcatStatusEventListener>();
     
+    private DefaultExecuteResultHandler handler = null;
+    
+    
+    private boolean running = false;
     public TomcatExecutor() {
         super();
         stdOutLog.setRunningRegex(".*Server startup in \\d+ ms");
         this.setStreamHandler(new PumpStreamHandler(stdOutLog));
         this.setWatchdog(watchdog);
+        handler =new DefaultExecuteResultHandler(){
+			@Override
+			public void onProcessComplete(int exitValue) {
+				super.onProcessComplete(exitValue);
+				running = false;
+				notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
+			}
+			
+			@Override
+			public void onProcessFailed(ExecuteException e) {
+				super.onProcessFailed(e);
+				running = false;
+				notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
+			}
+		}; 
     }
+    
 
     public void addTomcatLogEventListener(TomcatLogEventListener listener){
     	stdOutLog.addTomcatLogEventListener(listener);
@@ -89,20 +109,8 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     public void startup() throws HopperException{
     	validateEnv();
     	try {
-			execute(new CommandLine(getTomcatHome()+"/bin/startup.bat"), environment,new DefaultExecuteResultHandler(){
-				@Override
-				public void onProcessComplete(int exitValue) {
-					super.onProcessComplete(exitValue);
-					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
-				}
-				
-				@Override
-				public void onProcessFailed(ExecuteException e) {
-					super.onProcessFailed(e);
-					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
-				}
-			});
-			
+    		running = true;
+			execute(new CommandLine(getTomcatHome()+"/bin/startup.bat"), environment,handler);
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STARTED));
 		} catch (Exception e){
 			throw new HopperException("00101","启动服务失败"+e.getMessage());
@@ -113,19 +121,8 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     public void shutdown() throws HopperException{
     	validateEnv();
     	try {
-			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment,new DefaultExecuteResultHandler(){
-				@Override
-				public void onProcessComplete(int exitValue) {
-					super.onProcessComplete(exitValue);
-					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
-				}
-				
-				@Override
-				public void onProcessFailed(ExecuteException e) {
-					super.onProcessFailed(e);
-					notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.STOPPED));
-				}
-			});
+    		running = true;
+			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment,handler);
 			notifyTomcatStatus(new TomcatStatusEventObject(this, TomcatStatus.SHUTDOWN));
 		} catch (Exception e){
 			throw new HopperException("00102","关闭服务失败"+e.getMessage());
@@ -153,6 +150,12 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     		throw new HopperException("00100","未找到环境变量：CATALINA_HOME");
     	}
     }
+
+
+	@Override
+	public boolean isRunning() {
+		return running;
+	}
     
 
 }

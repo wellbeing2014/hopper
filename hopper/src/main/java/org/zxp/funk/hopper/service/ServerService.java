@@ -12,6 +12,7 @@ import org.zxp.funk.hopper.pojo.ServerStatus;
 public interface ServerService {
 	public void startup(String id,String operator) throws Exception;
 	public void shutdown(String id,String operator) throws Exception;
+	public void shutdownForce(String id,String operator) throws Exception;
 	public List<String> getlog(String id);
 	public ServerStatus[] getStatus();
 	public void addOperation(ServerOperation operation);

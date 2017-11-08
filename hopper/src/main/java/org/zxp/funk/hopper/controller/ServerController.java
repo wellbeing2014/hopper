@@ -137,8 +137,8 @@ public class ServerController {
 				ret.setMsg("抱歉，服务未能添加成功，请查看详细原因~");
 			else
 				ret.setMsg("抱歉，服务未能修改成功，请查看详细原因~");
-			ret.setErrorDetail(e.getMessage());
-			logger.error("添加服务错误："+e.getMessage());
+			ret.setErrorDetail(HopperException.getStackTrace(e));
+			logger.error("添加服务错误：",e);
 		}
 		return ret;
 	}
@@ -158,10 +158,10 @@ public class ServerController {
 		}catch(Exception e){
 			ret.setSuccess(false);
 			
-			ret.setMsg("抱歉，服务未能如愿删除，请查看详细原因~");
+			ret.setMsg("抱歉，服务未能删除:"+e.getMessage());
 
 			ret.setErrorDetail(HopperException.getStackTrace(e));
-			logger.error("删除服务错误："+HopperException.getStackTrace(e));
+			logger.error("删除服务错误",e);
 		}
 		return ret;
 	}
@@ -192,6 +192,9 @@ public class ServerController {
 			case 2:
 				ss.shutdown(id,ip);
 				break;
+			case 9:
+				ss.shutdownForce(id, ip);
+				break;
 			default:
 				throw new Exception("未知命令");
 			}
@@ -199,9 +202,10 @@ public class ServerController {
 			ret.setSuccess(true);
 		}catch(Exception e)
 		{
-			ret.setMsg("命令执行失败！");
+			ret.setMsg("命令执行失败:"+e.getMessage());
 			ret.setErrorDetail(HopperException.getStackTrace(e));
 			ret.setSuccess(false);
+			logger.error("命令执行失败:",e);
 		}
 		return ret;
 	}

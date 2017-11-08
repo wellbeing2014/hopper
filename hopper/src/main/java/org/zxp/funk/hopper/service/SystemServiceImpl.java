@@ -22,8 +22,8 @@ public class SystemServiceImpl implements SystemService {
 
 	@Transactional(readOnly=false)
 	@Override
-	public void addTomcat(ServerConfig server) {
-		srRep.save(server);
+	public ServerConfig addTomcat(ServerConfig server) {
+		return srRep.save(server);
 	}
 
 
@@ -50,8 +50,8 @@ public class SystemServiceImpl implements SystemService {
 
 
 	@Override
-	public void addJdk(JdkConfig jdkcof) {
-		jdk.save(jdkcof);
+	public JdkConfig addJdk(JdkConfig jdkcof) {
+		return jdk.save(jdkcof);
 	}
 
 	@Override

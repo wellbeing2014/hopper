@@ -48,6 +48,11 @@ public class ServerServiceImpl implements ServerService {
 	public void shutdown(String id,String operator) throws Exception{
 		serverlist.shutdown(id, operator);
 	}
+	
+	@Override
+	public void shutdownForce(String id,String operator) throws Exception{
+		serverlist.shutdownForce(id, operator);
+	}
 
 	@Override
 	public List<String> getlog(String id) {
@@ -68,7 +73,10 @@ public class ServerServiceImpl implements ServerService {
 		sc.setLasttime(createtime);
 		sc.setJdk(system.findOneJdk(sc.getJdk().getId()));
 		sc.setTomcat(system.findOneTomcat(sc.getTomcat().getId()));
-		sc = serverrep.save(sc);
+		if(isNew)
+			serverlist.add(sc);
+		else 
+			serverlist.update(sc);
 		ServerOperation so = new ServerOperation(sc.getServerid());
 		if (isNew)
 			so.setOperationtype(OperationType.新建);
@@ -77,7 +85,7 @@ public class ServerServiceImpl implements ServerService {
 		so.setOperator(operator);
 		so.setOperationtime(createtime);
 		operationRep.save(so);
-		serverlist.add(sc);
+		
 		return sc;
 	}
 	

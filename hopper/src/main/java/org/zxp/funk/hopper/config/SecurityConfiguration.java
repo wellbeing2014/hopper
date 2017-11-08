@@ -6,10 +6,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,8 +23,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsUtils;  
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;  
   
 
 /**
@@ -37,24 +35,28 @@ import org.springframework.web.cors.CorsUtils;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {  
   
+	@Value("${sys.login.username}")
+	String username;
+	@Value("${sys.login.password}")
+	String password;
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests()
-		    .antMatchers("/assets/**","/hopper-res/**","/jq/**","/hopper-jq/**","/version.json").permitAll()
+		    .antMatchers("/assets/**","/hopper-res/**","/LayR/**","/plugins/**","/version.json").permitAll()
 		    .anyRequest().authenticated()
 		    .and()
 		    	.addFilterAt(myUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class).exceptionHandling()
-		    	.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/new/login.html"))
+		    	.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/hopper_login.html"))
             .and()
 	            // 指定登录页面的请求路径
-	            .formLogin().loginPage("/new/login.html")
+	            .formLogin().loginPage("/hopper_login.html")
 	            // 登陆处理路径
 	            .loginProcessingUrl("/login").permitAll()
 	        .and()
 	            // 退出请求的默认路径为logout，下面改为signout，
 	            // 成功退出登录后的url可以用logoutSuccessUrl设置
-	            .logout().logoutSuccessUrl("/new/login.html").permitAll()
+	            .logout().logoutSuccessUrl("/hopper_login.html").permitAll()
             .and()               
             // 关闭csrf
             	.csrf().disable()
@@ -63,7 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             		.httpStrictTransportSecurity().disable()
             .and()
 				.sessionManagement().sessionFixation().changeSessionId()  
-				.maximumSessions(1).expiredUrl("/new/login.html");  
+				.maximumSessions(1).expiredUrl("/hopper.html");  
 	 }
 
 	@Override
@@ -74,11 +76,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	    
 	    auth.userDetailsService(new UserDetailsService(){
 	    	
-	    	MyUserDetails user1 = new MyUserDetails("zhuxinpei", "朱新培", "001", "peipei");
+	    	MyUserDetails user1 = new MyUserDetails(username, "系统管理员", "001", password);
 
 			@Override
 			public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-				if("zhuxinpei".equals(username))
+				if("superadmin".equals(username))
 					return user1;
 				else
 					throw new UsernameNotFoundException(username+"不存在！");
@@ -107,10 +109,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 					Authentication authentication) throws IOException, ServletException {
 			   request.getSession().setMaxInactiveInterval(100*60);//设置session过期时间
 			   //String url = super.determineTargetUrl(request, response);
-			   String url ="/new/index_iframe.html";
+			   String url ="/hopper.html";
 			   response.setCharacterEncoding("UTF-8");  
 		       response.setContentType("application/json");  
-		       response.getWriter().println("{\"ok\":\"1\",\"msg\":\"登录成功\",\"url\":\""+url+"\"}");  
+		       response.getWriter().println("{\"success\":true,\"msg\":\"登录成功\",\"retObj\":\""+url+"\"}");  
 			}
 		};
     }
@@ -124,7 +126,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         			AuthenticationException exception) throws IOException, ServletException {
         		response.setCharacterEncoding("UTF-8");  
      	       response.setContentType("application/json");  
-     	       response.getWriter().println("{\"ok\":0,\"msg\":\""+exception.getLocalizedMessage()+"\"}");
+     	       response.getWriter().println("{\"success\":false,\"msg\":\""+exception.getLocalizedMessage()+"\"}");
         	}
         	
         };
