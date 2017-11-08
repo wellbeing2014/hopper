@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="./plugins/font-awesome/css/font-awesome.min.css" media="all">
+    <style>
+        .info-box {
+            height: 85px;
+            background-color: white;
+            background-color: #ecf0f5;
+        }
+        
+        .info-box .info-box-icon {
+            border-top-left-radius: 2px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 2px;
+            display: block;
+            float: left;
+            height: 85px;
+            width: 85px;
+            text-align: center;
+            font-size: 45px;
+            line-height: 85px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-box .info-box-content {
+            padding: 5px 10px;
+            margin-left: 85px;
+        }
+        
+        .info-box .info-box-content .info-box-text {
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+        
+        .info-box .info-box-content .info-box-number {
+            display: block;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .main {
+            margin-top: 25px;
+        }
+        
+        .main .layui-row {
+            margin: 10px 0;
+        }
+        
+        .layui-table-body .layui-table,.layui-table-header .layui-table{width: 100%;}
+		.layui-table-body.layui-table-main .layui-table-cell,.layui-table-header .layui-table-cell{white-space: pre-wrap;word-wrap: break-word; word-break: break-all; height: auto;}
+    </style>
+</head>
+
+<body>
+    <div class="layui-fluid main">
+      
+      
+        <div class="layui-row layui-layout layui-col-md12">
+
+                <div class="layui-btn-group addgroup">
+                    <button class="layui-btn" data-type="refresh">刷新</button>
+                </div>
+
+                <div class="layui-layout-right">
+                <form class="layui-form layui-form-pane" action="">
+                    <label class="layui-form-label">过滤条件</label>
+                    <div class="layui-input-inline" style="width: 100px">
+                        <select id="serverStatus" name="serverStatus" >
+                            <option value="-1" selected="">全部操作</option>
+                            <option value="停止">停止</option>
+                            <option value="启动">启动</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 190px;">
+                        <input id="searchIpt" type="text" name="searchIpt" placeholder="搜名称"  autocomplete="off" class="layui-input">
+                    </div>
+                </form>
+                </div>
+                <table class="layui-table" id="opTable" lay-filter="op">
+
+                </table>
+        </div>
+    </div>
+
+   
+
+    <script src="./plugins/layui/layui.js"></script>
+    
+    <script id="tablelasttime" type="text/html">
+		{{ layui.util.timeAgo(d.operationtime,false)  }}
+		
+	</script>
+    
+    <script id="tablestatus" type="text/html">
+		{{# if (d.status=== '运行中') { }}
+		<span class="layui-badge-rim" style="background-color:#5FB878;color:white;" >{{d.status}}</span>
+		{{# } else if (d.status=== '已停止') { }}
+		<span class="layui-badge-rim" style="background-color:#c2c2c2;color:white;">{{d.status}}</span>
+		{{# }   else { }}
+		<span class="layui-badge-rim layui-bg-orange">{{d.status}}</span>
+		{{# }   }}
+	</script>
+    <script>
+        layui.config({
+            base: 'LayR/hopper-js/',
+            version: '1.0.1'
+        }).use(['jquery','form','table','request','util'], function() {
+            var $ = layui.$,
+            table = layui.table,
+            req=layui.request,
+            form = layui.form;
+            //监听搜索过滤条
+            form.on('select',function(){searchFilter()});
+            $("#searchIpt").bind('input propertychange',function(){searchFilter()});
+            var searchFilter = function(){
+            	
+            	var filter = $("#searchIpt").val();
+                var status = $("#serverStatus").val();
+                
+            	
+                var _serverFilter = _servers.filter(function (server) {
+                    var str = server.mainport+server.servername,sta = server.status;
+
+                    return (status==sta || status=="-1")&&(str.indexOf(filter)!=-1);
+                });
+                table.reload('idTest',{ //其它参数在此省略
+                    elem:'#serverTable',
+                    // url: './build/data/user.json',
+                    data:_serverFilter
+                });
+            }
+
+            $('.addgroup .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            var active = {
+                refresh: function(){
+                   
+                }
+            };
+            var initTable = function () {
+                table.render({ //其它参数在此省略
+                    elem:'#opTable',
+                    url: '/server/allopers.json',
+                    cols:[[
+                        {checkbox: true}
+                        ,{field: 'servername', title: '操作对象',styles:'width:50%', width: 'auto'}
+                        ,{field: 'operator', title: '记录IP',styles:'width:20%', width: 'auto'}
+                        ,{field: 'operationtype', title: '操作类型',styles:'width:100px', width: 'auto'}
+                        ,{field: 'operationtime', title: '操作时间', styles:'width:20%', width: 'auto',templet: '#tablelasttime'}
+                    ]],
+                    limit: 15,
+                    limits: [5,10,15,20,30],
+                    page:true,
+                    request: {
+                    	  pageName: 'pageno' //页码的参数名称，默认：page
+                    	  ,limitName: 'pagecount' //每页数据量的参数名，默认：limit
+                    	},
+                   	response: {
+                   		  statusName: 'success' //数据状态的字段名称，默认：code
+                   		  ,statusCode: true //成功的状态码，默认：0
+                   		  ,msgName: 'msg' //状态信息的字段名称，默认：msg
+                   		  ,countName: 'count' //数据总数的字段名称，默认：count
+                   		  ,dataName: 'retObj' //数据列表的字段名称，默认：data
+                   		},    
+                    id:'idTest'
+                });
+            };
+            initTable();
+          
+        });
+    </script>
+</body>
+
+</html>

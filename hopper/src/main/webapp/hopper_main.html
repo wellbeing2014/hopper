@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="./plugins/font-awesome/css/font-awesome.min.css" media="all">
+    <style>
+        .info-box {
+            height: 85px;
+            background-color: white;
+            background-color: #ecf0f5;
+        }
+        
+        .info-box .info-box-icon {
+            border-top-left-radius: 2px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 2px;
+            display: block;
+            float: left;
+            height: 85px;
+            width: 85px;
+            text-align: center;
+            font-size: 45px;
+            line-height: 85px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-box .info-box-content {
+            padding: 5px 10px;
+            margin-left: 85px;
+        }
+        
+        .info-box .info-box-content .info-box-text {
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+        
+        .info-box .info-box-content .info-box-number {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+
+        .desc{
+        	 margin: 25px;
+        }
+        .desc a{
+        	 color:red;
+        }
+        .main {
+            margin-top: 25px;
+        }
+        
+        .main .layui-row {
+            margin: 10px 0;
+        }
+        .barbtn{
+        	margin-left:0px !important;
+        }
+        .layui-table-body .layui-table,.layui-table-header .layui-table{width: 100%;}
+		.layui-table-body.layui-table-main .layui-table-cell,.layui-table-header .layui-table-cell{white-space: pre-wrap;word-wrap: break-word; word-break: break-all; height: auto;}
+    </style>
+</head>
+
+<body>
+    <div class="layui-fluid main">
+      
+        <div class="layui-row layui-col-space15" id='metric'>
+            <div class="layui-col-md3">
+                <div class="info-box">
+                    <span class="info-box-icon" style="background-color:#00c0ef !important;color:white;"><i class="fa fa-heartbeat" aria-hidden="true"></i></span>
+                    <div class="info-box-content">
+                    	<br>
+                        <span class="info-box-text">CPU 使用率</span>
+                        
+                        <br>
+                       <div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="cpu">
+						  <div class="layui-progress-bar layui-bg-green" lay-percent="0%"></div>
+						</div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md3">
+                <div class="info-box">
+                    <span class="info-box-icon" style="background-color:#dd4b39 !important;color:white;"><i class="fa fa-database" aria-hidden="true"></i></span>
+                    <div id="diskMetric" class="info-box-content">
+                       
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md3">
+                <div class="info-box">
+                    <span class="info-box-icon" style="background-color:#00a65a !important;color:white;"><i class="fa fa-microchip" aria-hidden="true"></i></span>
+                    <div class="info-box-content">
+                    	<br>
+                        <span class="info-box-text">内存使用率</span>
+                        <br>
+							<div class="layui-progress layui-progress-big" lay-showpercent="true" lay-filter="mem">
+							  <div class="layui-progress-bar layui-bg-red" lay-percent="0%"></div>
+							</div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md3">
+                <div class="info-box">
+                    <span class="info-box-icon" style="background-color:#f39c12 !important;color:white;"><i class="fa fa-exchange" aria-hidden="true"></i></span>
+                    <div id="netmetric" class="info-box-content">
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-row layui-layout layui-col-md12">
+
+                <div class="layui-btn-group addgroup">
+                    <button class="layui-btn" data-type="add">直接添加</button>
+                    <button class="layui-btn" data-type="copy">复制添加</button>
+                </div>
+
+                <div class="layui-btn-group serverOperate">
+                    <button class="layui-btn layui-btn-primary" data-type="watchlog">查看日志</button>
+                    <button class="layui-btn layui-btn-primary" data-type="start">批量启动</button>
+                    <button class="layui-btn layui-btn-primary" data-type="stop">批量停止</button>
+                </div>
+                <div class="layui-layout-right">
+                <form class="layui-form layui-form-pane" action="">
+                    <label class="layui-form-label">过滤条件</label>
+                    <div class="layui-input-inline" style="width: 100px">
+                        <select id="serverStatus" name="serverStatus" >
+                            <option value="-1" selected="">全  部</option>
+                            <option value="正在启动">启动中</option>
+                            <option value="运行中">已启动</option>
+                            <option value="正在停止">停止中</option>
+                            <option value="已停止">已停止</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline" style="width: 190px;">
+                        <input id="searchIpt" type="text" name="searchIpt" placeholder="搜端口、名称"  autocomplete="off" class="layui-input">
+                    </div>
+                </form>
+                </div>
+                <table class="layui-table" id="serverTable" lay-filter="servert">
+
+                </table>
+        </div>
+    </div>
+
+    <script type="text/html" id="barDemo">
+		<a class="layui-btn layui-btn-primary layui-btn-mini barbtn" lay-event="watch">日志</a>
+        <a class="layui-btn layui-btn-primary layui-btn-mini barbtn" lay-event="start">启动</a>
+		<a class="layui-btn layui-btn-primary layui-btn-mini barbtn" lay-event="stop">停止</a>
+        <a class="layui-btn layui-btn-primary layui-btn-mini barbtn" lay-event="edit">编辑</a>
+        <a class="layui-btn layui-btn-danger layui-btn-mini barbtn" lay-event="del">删除</a>
+    </script>
+
+    <script src="./plugins/layui/layui.js"></script>
+    
+    <script id="tablelasttime" type="text/html">
+		{{ layui.util.timeAgo(d.lasttime,false)  }}
+	</script>
+	
+	<script id="network" type="text/html">
+		<br>
+		<span class="info-box-text">网络吞吐量</span>
+		<br>
+        <span class="info-box-number">{{d.net}}</span>
+	</script>
+	
+	
+	<script id="disk" type="text/html">
+		<br>
+		<span class="info-box-text">硬盘使用率</span>
+		<br>
+        <span class="info-box-number">
+			{{# for(var key in d.disk ){ }}
+					{{ key }} 盘: {{d.disk[key]*100}}% |
+			{{# } }}
+		</span>
+	</script>
+    
+    <script id="tablestatus" type="text/html">
+		{{# if (d.status=== '运行中') { }}
+		<span class="layui-badge-rim" style="background-color:#5FB878;color:white;" >{{d.status}}</span>
+		{{# } else if (d.status=== '已停止') { }}
+		<span class="layui-badge-rim" style="background-color:#c2c2c2;color:white;">{{d.status}}</span>
+		{{# }   else { }}
+		<span class="layui-badge-rim layui-bg-orange">{{d.status}}</span>
+		{{# }   }}
+	</script>
+    <script>
+        layui.config({
+            base: 'LayR/hopper-js/',
+            version: '1.0.1'
+        }).use(['jquery','table','form','request','laytpl','websocket','element','util'], function() {
+            var _servers = [];
+            var $ = layui.$,
+            table = layui.table,
+            tab = parent.tab,
+            req=layui.request,
+            form=layui.form,
+            tpl = layui.laytpl,
+            Sock = layui.websocket('/hopperserver'),
+            element=layui.element;
+            var netTpl = $('#network').html(),
+            	diskTpl =  $('#disk').html(),
+        		netmetric = $('#netmetric'),
+        	 	diskmetric = $('#diskMetric') ;
+            
+            element.init();
+            //订阅消息
+            Sock.connect(function(){
+            	Sock.subscribe('/topic/metric',function(msg){
+                	var data = JSON.parse(msg.body);
+                	/* tpl(getTpl).render(data, function(html){
+                		metric.html(html);
+                	});
+                	element.init(); */
+                	element.progress('cpu', data.cpu,true);
+                	element.progress('test', 80+'%');
+                	element.progress('mem', data.mem,true);
+                	
+                	tpl(netTpl).render(data, function(html){
+                		netmetric.html(html);
+                	});
+                	
+                	tpl(diskTpl).render(data, function(html){
+                		diskmetric.html(html);
+                	});
+                });
+            	
+            	Sock.subscribe('/topic/serverstatus',function(msg){
+                	_servers = JSON.parse(msg.body);
+                	searchFilter();
+                });
+            });
+           //获取服务
+            req({
+               url:'/server/allserver.json',
+                method:'GET',
+                success:function (ret) {
+                    _servers = ret.retObj;
+                    initTable(_servers);
+                }
+            });
+
+            //监听表格操作列
+            table.on('tool(servert)', function(obj){
+                var data = obj.data;
+                if(obj.event === 'watch'){
+                	tab.tabAdd({
+                        id: data.serverid,
+                        title: '查看日志-['+data.mainport+']',
+                        icon: 'fa-file',
+                        url: 'hopper_log.html?id='+data.serverid+'&name='+data.servername
+                    });
+            	}else
+            	if(obj.event === 'start'){
+            		if("已停止"!=data.status)
+            		{
+            			layer.msg('本服务还在运行中，您不能要求它再次启动,除非您先把它停止。', {
+            				  icon: 5,
+            				  time: 3000 //2秒关闭（如果不配置，默认是3秒）
+            				}); 
+            			return;
+            		}
+            		layer.confirm('确定要启动['+data.servername+']该服务吗？',{icon: 3, title:'启动'}, function(index){
+            			tab.tabAdd({
+                            id: data.serverid,
+                            title: '查看日志-['+data.mainport+']',
+                            icon: 'fa-file',
+                            url: 'hopper_log.html?id='+data.serverid+'&name='+data.servername
+                        });
+            			setTimeout(function () { 
+            				req({
+                                url:'/server/operate.json',
+                                 method:'GET',
+                                 data:{'id':data.serverid,'type':1},
+                                 success:function (ret) {
+                                	 layer.msg(ret.msg, {
+                               		  icon: 1,
+                               		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                               		});
+                                 }
+                             });
+            		    }, 2000);
+                        layer.close(index);
+                    });
+            	}else
+                if(obj.event === 'stop'){
+                	layer.confirm('确定要停止['+data.servername+']该服务吗？',{icon: 3, title:'停止'}, function(index){
+                    	req({
+                            url:'/server/operate.json',
+                             method:'GET',
+                             data:{'id':data.serverid,'type':2},
+                             success:function (ret) {
+                            	 layer.msg(ret.msg, {
+                           		  icon: 1,
+                           		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                           		});
+                             }
+                         });
+                        layer.close(index);
+                    });
+                } else if(obj.event === 'del'){
+                	if("已停止"!=data.status){
+                		layer.msg('抱歉,服务不在停止状态，系统不愿帮您自动停止服务，请先手工停止服务', {icon: 5,anim: 6});
+                	}
+                	else{
+                    layer.confirm('确定要删除['+data.servername+']',{icon: 3, title:'删除'}, function(index){
+                    	req({
+                            url:'/server/remove.json',
+                             method:'GET',
+                             data:{'serverid':data.serverid},
+                             success:function (ret) {
+                            	 layer.msg(ret.msg, {
+                           		  icon: 1,
+                           		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                           		});
+                             }
+                         });
+                        layer.close(index);
+                    });
+                	}
+                } else if(obj.event === 'edit'){
+                	layer.open({
+                        title:"编辑服务",
+                        type: 2,
+                        content: 'hopper_form.html?id='+data.serverid+'&edit=true',
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true,
+                        area: ['900px', '90%'],
+                        scrollbar: false
+                    });
+                }else if(obj.event === 'showRemark'){
+                	var td = $(obj.tr).children('td')[1];
+                	var offseta=$(td).offset();
+                	offseta.left=offseta.left+$(td).width()+20;
+                	offseta.top=offseta.top+20
+                	layer.open({
+              		  type: 1,
+              		  title: false,
+              		  closeBtn:0,
+              		  shadeClose: true,
+              		  offset: [offseta.top,offseta.left],
+              		  content:  '<div class="desc">'+data.mark+'</div>'
+              		});
+                }
+            });
+
+            //监听搜索过滤条
+            form.on('select',function(){searchFilter()});
+            $("#searchIpt").bind('input propertychange',function(){searchFilter()});
+            var searchFilter = function(){
+            	
+            	var filter = $("#searchIpt").val();
+                var status = $("#serverStatus").val();
+                
+            	
+                var _serverFilter = _servers.filter(function (server) {
+                    var str = server.mainport+server.servername,sta = server.status;
+
+                    return (status==sta || status=="-1")&&(str.indexOf(filter)!=-1);
+                });
+                table.reload('idTest',{ //其它参数在此省略
+                    elem:'#serverTable',
+                    // url: './build/data/user.json',
+                    data:_serverFilter
+                });
+                
+            }
+
+            $('.addgroup .layui-btn ,.serverOperate .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            var active = {
+                add: function(){
+                    layer.open({
+                        title:"添加一个服务",
+                        type: 2,
+                        content: 'hopper_form.html',
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true,
+                        area: ['900px', '90%'],
+                        scrollbar: false
+                    });
+                },
+                copy: function(){
+                	var checkStatus = table.checkStatus('idTest')
+                	,data = checkStatus.data;
+                	if(!data[0]){ layer.msg('请选择一个服务');return}
+                    layer.open({
+                        title:"复制添加一个服务",
+                        type: 2,
+                        content: 'hopper_form.html?id='+data[0].serverid,
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true,
+                        area: ['900px', '90%'],
+                        scrollbar: false
+                    });
+                },
+                start: function(){ //获取选中数据
+                    var checkStatus = table.checkStatus('idTest')
+                        ,data = checkStatus.data;
+                    if(!data[0]){ layer.msg('请选择一些服务');return};
+                    layer.confirm('确定要启动这么 '+data.length+' 个服务吗？\r\n 如果勾选了已经启动的服务，系统不会让它再次启动',{icon: 3, title:'批量启动'}, function(index){
+                    	
+                    	for(var i = 0;i<data.length;i++){
+                    		if(data[i].status=="已停止"){
+                    		req({
+                                url:'/server/operate.json',
+                                 method:'GET',
+                                 data:{'id':data[i].serverid,'type':1}
+                             });
+                    		}
+                    	}
+                    	
+	                   	layer.msg('批量启动完成，系统也不清楚有多少启动成功，请自行检查', {
+	                     		  icon: 1,
+	                     		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+	                    });
+                    	
+                        layer.close(index);
+                    });
+                },
+                
+                stop: function(){ //获取选中数据
+                    var checkStatus = table.checkStatus('idTest')
+                        ,data = checkStatus.data;
+                    if(!data[0]){ layer.msg('请选择一些服务');return};
+                    layer.confirm('确定要停止这么 '+data.length+' 个服务吗？',{icon: 3, title:'批量停止'}, function(index){
+                    	
+                    	for(var i = 0;i<data.length;i++){
+                    		req({
+                                url:'/server/operate.json',
+                                 method:'GET',
+                                 data:{'id':data[i].serverid,'type':2}
+                             });
+                    	}
+	                   	layer.msg('批量停止完成，系统也不清楚有多少停止成功，请自行检查', {
+	                     		  icon: 1,
+	                     		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+	                    });
+                    	
+                        layer.close(index);
+                    });
+                },
+                
+                getCheckData: function(){ //获取选中数据
+                    var checkStatus = table.checkStatus('idTest')
+                        ,data = checkStatus.data;
+                    layer.alert(JSON.stringify(data));
+                }
+                ,getCheckLength: function(){ //获取选中数目
+                    var checkStatus = table.checkStatus('idTest')
+                        ,data = checkStatus.data;
+                    layer.msg('选中了：'+ data.length + ' 个');
+                }
+                ,isAll: function(){ //验证是否全选
+                    var checkStatus = table.checkStatus('idTest');
+                    layer.msg(checkStatus.isAll ? '全选': '未全选')
+                }
+                ,watchlog:function(){
+                	var checkStatus = table.checkStatus('idTest')
+                    ,data = checkStatus.data;
+                if(!data[0]){ layer.msg('请选择一个服务');return};
+                    tab.tabAdd({
+                        id: data[0].serverid,
+                        title: '查看日志-['+data[0].mainport+']',
+                        icon: 'fa-file',
+                        url: 'hopper_log.html?id='+data[0].serverid+'&name='+data[0].servername
+                    });
+                }
+            };
+            var initTable = function (data) {
+                table.render({ //其它参数在此省略
+                	
+                    elem:'#serverTable',
+                    // url: './build/data/user.json',
+                    cols:[[
+                        {checkbox: true}
+                        ,{field: 'mainport', title: '主端口',styles:'width:100px', width: 'auto' ,event: 'showRemark', style:'cursor: pointer;'}
+                        ,{field: 'servername', title: '服务名称',styles:'width:50%', width: 'auto'}
+                        ,{field: 'lasttime', title: '最后操作',styles:'width:200px', width: 'auto',templet: '#tablelasttime'}
+                        ,{field: 'status', title: '状态', styles:'width:10%', width: 'auto',templet: '#tablestatus'}
+                        ,{  title: '操作', align:'center',styles:'width:20%', width: 'auto', toolbar: '#barDemo'}
+                    ]],
+                    limit: 15,
+                    initSort: {
+										    field: 'mainport' //排序字段，对应 cols 设定的各字段名
+										    ,type: 'asc' //排序方式  asc: 升序、desc: 降序、null: 默认排序
+										},
+                    limits:[10,15,20,30,50],
+                    page:true,
+                    data:data,
+                    id:'idTest'
+                });
+                setInterval(searchFilter, 60000);
+            };
+
+            $('#test').on('click', function() {
+                parent.message.show({
+                    skin: 'cyan'
+                });
+            });
+            
+            maintimeAgo=function(time){
+          	  return util.timeAgo(time, false);
+            }
+        });
+    </script>
+</body>
+
+</html>

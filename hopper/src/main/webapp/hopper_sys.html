@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+
+<style>
+    .main {
+        margin-top: 25px;
+    }
+
+    .main .layui-row {
+        margin: 10px 0;
+    }
+</style>
+</head>
+<body class=" main">
+<div class="layui-fluid">
+
+    <div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+        <ul class="layui-tab-title">
+        	<li class="layui-this">监控配置</li>
+            <li>远程终端</li>
+        </ul>
+        <div class="layui-tab-content" style="height: 100px;">
+        	<div class="layui-tab-item layui-show">
+        	分段 预警 css样式
+        	复选选择硬盘 盘符
+               生成远程私钥
+            </div>
+            <div class="layui-tab-item ">
+                <div class="layui-row">
+                    <div class="layui-btn-group addgroup">
+                        <button class="layui-btn" data-type="add">直接添加</button>
+                    </div>
+                    <table class="layui-table" id="remotetable" lay-filter="remotetable">
+
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script type="text/html" id="Opr">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+<script src="./plugins/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.config({
+        base: 'LayR/hopper-js/',
+        version: '1.0.1'
+    }).use(['table','element'], function() {
+        var $ = layui.jquery,table=layui.table;
+        table.render({ //其它参数在此省略
+            elem:'#remotetable',
+            // url: './build/data/user.json',
+            cols:[[
+                {checkbox: true}
+                ,{field: 'name', title: '远程终端名称', width: 200}
+                ,{field: 'apiurl', title: '接口地址', width: 500 }
+                ,{field: 'icon', title: '图标', width:80}
+                ,{  title: '操作',width:160, align:'center', toolbar: '#Opr'}
+            ]],
+            data:[{'name':'174终端','apiurl':'http://192.10.110.174:801/api','icon':'2'}],
+            id:'remotetableid'
+        });
+    });
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+
+<style>
+    .main {
+        margin-top: 25px;
+    }
+
+    .main .layui-row {
+        margin: 10px 0;
+    }
+</style>
+</head>
+<body class=" main">
+<div class="layui-fluid">
+
+
+    <div class="layui-row layui-layout layui-col-md12">
+
+        <div class="layui-btn-group addgroup">
+            <button class="layui-btn" data-type="add">直接添加</button>
+            <button class="layui-btn" data-type="refresh">刷新</button>
+        </div>
+
+        <table class="layui-table" id="tomcattable" lay-filter="tomcattable">
+        </table>
+    </div>
+
+    <div id="editform"  class="layui-fluid " style="display: none">
+
+        <form class="layui-form" action="" >
+            <div class="layui-form-item">
+				<input type="hidden" name="id" value="{{ d.id }}" class="layui-input">
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">容器名称</label>
+                <div class="layui-input-block">
+                    <input   type="text" name="name" value="{{ d.name }}" lay-verify="required" autocomplete="off" placeholder="请输入名称" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">容器类型</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="type" value="tomcat" title="TOMCAT" checked>
+                    <input type="radio" name="type" value="weblogic" title="WEBLOGIC" disabled>
+                    <input type="radio" name="type" value="weblogic" title="JBOSS" disabled>
+                    <input type="radio" name="type" value="weblogic" title="JETTY" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">安装路径</label>
+                <div class="layui-input-block">
+                    <input   type="text" name="path" value="{{ d.path }}" lay-verify="required"  autocomplete="off" placeholder="请输入容器的安装路径" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">附加参数</label>
+                <div class="layui-input-block">
+                    <input   type="text" name="args"  value="{{ d.args }}"  autocomplete="off" placeholder="参数可以为空" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">平台</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="plat" value="1" title="x86">
+                    <input type="radio" name="plat" value="2" title="x64" checked>
+                    <input type="radio" name="plat" value="0" title="ANY" >
+                </div>
+            </div>
+			<hr />
+	        <div class="layui-form-item">
+	            <div class="layui-input-block">
+	                <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+	            </div>
+	        </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/html" id="tomcatOpr">
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+<script type="text/html" id="platName">
+    <div>
+        {{# if(d.platform ==2 ){ }}
+                    X64
+        {{#    } else if(d.platform ==1) { }}
+                    X86
+        {{#    } else { }}
+                    ANY
+        {{#    }   }}
+    </div>
+</script>
+
+<script src="./plugins/layui/layui.js"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+    layui.config({
+        base: 'LayR/hopper-js/',
+        version: '1.0.1'
+    }).use(['layer','form','table','request','laytpl'], function() {
+        var $ = layui.jquery,table=layui.table,req=layui.request,
+	        tpl=layui.laytpl,
+	    	form = layui.form;
+        
+        var tomcatform = $('#editform');
+        var tomcatformtpl = tomcatform.html();
+        var bindform = function(data){
+        	tpl(tomcatformtpl).render(data, function(html){
+        		tomcatform.html(html);
+           	});
+        };
+        
+      //监听提交
+        form.on('submit(demo1)', function(data) {
+            var a = $(data.form).serializeObject(); 
+            req({
+                url:'/system/add.json',
+                method:'post',
+                contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                data:a,
+                success:function (ret) {
+                	active['refresh'].call();
+                	layer.msg(ret.msg, {
+                		  icon: 1,
+                		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                		}, function(){
+                            layer.closeAll();
+                		});   
+                }
+            });
+            return false;
+        });
+        
+        req({
+            url:'./system/getTomcats.json',
+            method:'GET',
+            success:function (ret) {
+                table.render({ //其它参数在此省略
+                    elem:'#tomcattable',
+                    // url: './build/data/user.json',
+                    cols:[[
+                        {checkbox: true}
+                        ,{field: 'name', title: '容器名称',styles:'width:20%', width: 'auto'}
+                        ,{field: 'path', title: '安装路径', styles:'width:30%',width: 'auto'}
+                        ,{field: 'args', title: '默认参数', styles:'width:30%',width: 'auto',templet: '<div>{{# if(d.args.length==0) { }} 无 {{#  } else {  }} {{d.args}} {{# }  }}</div>' }
+                        ,{field: 'platform', title: '平台类型',styles:'width:10%',width: 'auto' , templet: '#platName'}
+                        ,{title: '操作',styles:'width:10%',width: 'auto', align:'center', toolbar: '#tomcatOpr'}
+                    ]],
+                    data:ret.retObj,
+                    id:'tomcattableid'
+                });
+            }
+        });
+
+        //监听表格操作列
+        table.on('tool(tomcattable)', function(obj){
+        	var data = obj.data;
+            if(obj.event === 'detail'){
+                layer.msg('ID：'+ data.serverid + ' 的查看操作');
+            } else if(obj.event === 'del'){
+                layer.confirm('真的删除这个容器?',{icon: 3, title:'删除'}, function(index){
+                	req({
+                        url:'./system/delServer.json',
+                        method:'POST',
+                        data:{id:data.id},
+                        contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                        success:function (ret) {
+                        	layer.msg(ret.msg, {
+                      		  icon: 1,
+                      		  time: 1000 //1秒关闭（如果不配置，默认是3秒）
+                      		}, function(){
+                      			active['refresh'].call();
+                      		});   
+                        }
+                    });
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                bindform(data);
+                $("input:radio[value='"+data.platform+"']").attr('checked','true');
+                form.render('radio');
+                layer.open({
+                    title: "编辑容器",
+                    closeBtn:2,
+                    type: 1,
+                    area:['540px','450px'],
+                    content: $('#editform'),
+                    fix:true
+                });
+            }
+        });
+
+        $('.addgroup .layui-btn ').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+        var active = {
+        		add: function () {
+                	var data={id:"",name:"",path:'',args:''};
+                	bindform(data);
+                	$("input:radio[value='0']").attr('checked','true');
+                    form.render('radio');
+                    layer.open({
+                        title: "添加一个容器",
+                        closeBtn:2,
+                        type: 1,
+                        area:['540px','450px'],
+                        content: $('#editform'),
+                        fix:true
+                    });
+                },
+                refresh: function () {
+                	req({
+                        url:'./system/getTomcats.json',
+                        method:'GET',
+                        success:function (ret) {
+                            table.reload('tomcattableid',{ //其它参数在此省略
+                                data: ret.retObj
+                            });
+                        }
+                    });
+                }
+        }
+    });
+</script>
+
+</body>
+
+</html>
