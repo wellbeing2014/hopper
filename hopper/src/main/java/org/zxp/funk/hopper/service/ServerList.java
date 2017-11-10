@@ -1,5 +1,6 @@
 package org.zxp.funk.hopper.service;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.zxp.funk.hopper.core.ServerBehavior;
 import org.zxp.funk.hopper.core.TomcatLogEventListener;
 import org.zxp.funk.hopper.core.TomcatLogEventObject;
-import org.zxp.funk.hopper.core.TomcatStatus;
 import org.zxp.funk.hopper.core.TomcatStatusEventListener;
 import org.zxp.funk.hopper.core.TomcatStatusEventObject;
 import org.zxp.funk.hopper.jpa.entity.OperationType;
@@ -58,6 +58,9 @@ public class ServerList {
 	
 	@PostConstruct
 	public void init() throws Exception{
+		logger.info("正在检测服务配置目录是否可用："+serverConfigDir);
+		File configdir = new File(serverConfigDir);
+		configdir.mkdirs();
 		logger.info("正在装填服务："+serverRep.count()+"条");
 		List<TomcatServer> serverlist = serverRep.findAll();
 		
@@ -88,7 +91,7 @@ public class ServerList {
 			list.add(sb);
 		}
 		flush();
-		logger.info("正在检测服务配置目录是否可用："+serverConfigDir);
+		
 	}
 	
 	public void flush(){
@@ -129,6 +132,7 @@ public class ServerList {
 				list.remove(sb_d);
 			}
 		}
+		server.setServerid(serverRep.save(server).getServerid());
 		ServerBehavior sb  =new ServerBehavior(server,serverConfigDir);
 		sb.addTomcatLogEventListener(new TomcatLogEventListener() {
 			@Override
@@ -144,7 +148,7 @@ public class ServerList {
 				
 			}
 		});
-		serverRep.save(server);
+		
 		list.add(sb);
 		flush();
 		brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());

@@ -412,11 +412,11 @@ public class XmlUtil {
      */
     public static void copyChildNodes(Node source, Node target) {
         
-        List nodeList = copyNodeList(source.getChildNodes());
+        List<Node> nodeList = copyNodeList(source.getChildNodes());
         int childCount = nodeList.size();
         
         for(int i = 0; i < childCount; i++) {
-            target.appendChild((Node)nodeList.get(i));
+            target.appendChild(nodeList.get(i));
         }
     }
     

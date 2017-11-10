@@ -33,6 +33,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 	public void configureDefaultServletHandling(
 	        DefaultServletHandlerConfigurer configurer) {
 	    configurer.enable();
+	    
 	}
 	
 	// add the resolver

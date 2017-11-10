@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
  
 @Entity
-@Table(name="conf_servers")
+@Table(name="HPR_CONTAINER")
 @JsonIgnoreProperties({ "plat" })
 public class ServerConfig implements Serializable {
 	
@@ -31,8 +31,10 @@ public class ServerConfig implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+//	@GeneratedValue(generator = "uuid")
+//  @GenericGenerator(name = "uuid", strategy = "uuid")
+	@GenericGenerator(name="systemUUID",strategy="uuid")
+	@GeneratedValue(generator="systemUUID")
     //@Column(columnDefinition = "CHAR(32)")
     @Column(name = "ID")
 	@Id
@@ -49,7 +51,7 @@ public class ServerConfig implements Serializable {
     @Column(name = "ARGS")
     private String args;
     
-    @Column(name = "PLAT",columnDefinition="INT(1) default 1")
+    @Column(name = "PLAT")
     private int plat; 
     
     @JsonInclude(JsonInclude.Include.NON_NULL)

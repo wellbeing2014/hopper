@@ -14,7 +14,6 @@ import org.springframework.messaging.support.ChannelInterceptorAdapter;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.zxp.funk.hopper.jpa.repository.ServerOperationRepository;
 import org.zxp.funk.hopper.service.ServerList;  
   
 

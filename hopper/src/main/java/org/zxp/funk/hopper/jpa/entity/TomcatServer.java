@@ -18,7 +18,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name="SERVER")
+@Table(name="HPR_TOMCAT_SERVER")
 public class TomcatServer implements Serializable {
 	
 	/**
@@ -29,8 +29,10 @@ public class TomcatServer implements Serializable {
 	private static final long serialVersionUID = -4819142500293622156L;
 	
 	@Id
-	@GeneratedValue(generator = "uuid")
-	@GenericGenerator(name = "uuid", strategy = "uuid")
+//	@GeneratedValue(generator = "uuid")
+//	@GenericGenerator(name = "uuid", strategy = "uuid")
+	@GenericGenerator(name="systemUUID",strategy="uuid")
+	@GeneratedValue(generator="systemUUID")
 	private String serverid;
 	private int mainport;
 	private int shutport;

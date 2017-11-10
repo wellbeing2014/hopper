@@ -16,7 +16,7 @@ import org.hibernate.annotations.GenericGenerator;
 import com.fasterxml.jackson.annotation.JsonFormat;
  
 @Entity
-@Table(name="OPERATION")
+@Table(name="HPR_OPERATION")
 public class ServerOperation implements Serializable {
 	
 	
@@ -28,8 +28,10 @@ public class ServerOperation implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+//	@GeneratedValue(generator = "uuid")
+//    @GenericGenerator(name = "uuid", strategy = "uuid")
+	@GenericGenerator(name="systemUUID",strategy="uuid")
+	@GeneratedValue(generator="systemUUID")
     //@Column(columnDefinition = "CHAR(32)")
 	@Id
     private String operationid;

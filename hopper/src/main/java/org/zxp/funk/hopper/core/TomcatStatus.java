@@ -1,7 +1,5 @@
 package org.zxp.funk.hopper.core;
 
-import org.zxp.funk.hopper.utils.Platform;
-
 public enum TomcatStatus {
 	STARTED("正在启动"),
 	RUNNING("运行中"),

@@ -12,9 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.Database;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
@@ -91,8 +92,11 @@ public class JPAConfiguration {
 	*/
 	
 	
+	
+	
 	@Bean(name = "dataSource")
 	public DataSource dataSource() {
+		
 		com.alibaba.druid.pool.DruidDataSource dataSource = new com.alibaba.druid.pool.DruidDataSource();
 		dataSource.setDriverClassName(driverClass);
 		dataSource.setUrl(url);
@@ -110,22 +114,25 @@ public class JPAConfiguration {
 		dataSource.setTestOnReturn(testOnReturn);
 		dataSource.setPoolPreparedStatements(poolPreparedStatements);
 		dataSource.setMaxPoolPreparedStatementPerConnectionSize(maxPoolPreparedStatementPerConnectionSize);
-		logger.info("数据库："+url+" 链接成功");
 		try {
 			dataSource.setFilters(filters);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			logger.error("数据库："+url+" 链接失败："+e.getMessage());
+			logger.error("数据库："+url+" 设置Filters失败：",e);
 		}
 		return dataSource;
 	}
 	
-	@Value("${hibernate.dialect}")
+	@Value("${jpa.dialect}")
 	String hibernate_dialect;
-	@Value("${hibernate.show_sql}")
+	@Value("${jpa.show_sql}")
 	boolean hibernate_show_sql;
-	@Value("${hibernate.format_sql}")
+	@Value("${jpa.format_sql}")
 	boolean hibernate_format_sql;
+	@Value("${jpa.generateddl}")
+	boolean hibernate_generateddl;
+	
+//	@Value("${hibernate.hbm2ddl.auto}")
+//	String hibernate_hbm2ddl_auto;
 	
 	/*@Bean(name={"sessionFactory"})
     public LocalSessionFactoryBean sessionFactory() {
@@ -141,7 +148,7 @@ public class JPAConfiguration {
         
      }*/
     
-	 @Bean(name={"entityManagerFactory"})
+	 //@Bean(name={"entityManagerFactory"})
      public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
          LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
          entityManagerFactoryBean.setDataSource(dataSource());
@@ -151,10 +158,26 @@ public class JPAConfiguration {
          properties.put("hibernate.dialect", hibernate_dialect);
          properties.put("hibernate.show_sql", hibernate_show_sql);
          properties.put("hibernate.format_sql", hibernate_format_sql);
+         //properties.put("hibernate_hbm2ddl_auto", hibernate_hbm2ddl_auto);
          entityManagerFactoryBean.setJpaProperties(properties);
          return entityManagerFactoryBean;
      }
 	
+	 @Bean(name={"entityManagerFactory"})
+	 public LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean(){
+	     HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+	     vendorAdapter.setDatabase(Database.DEFAULT);
+	     vendorAdapter.setGenerateDdl(hibernate_generateddl);
+	     vendorAdapter.setShowSql(hibernate_show_sql);
+	     vendorAdapter.setDatabasePlatform(hibernate_dialect);
+	     LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+	     factory.setJpaVendorAdapter(vendorAdapter);
+	     factory.setPackagesToScan("org.zxp.funk.hopper.jpa.entity");
+	     factory.setDataSource(dataSource());
+	     factory.afterPropertiesSet();
+	     return factory;
+	 }
+	 
 	 @Bean
      public JpaTransactionManager transactionManager() {
          JpaTransactionManager transactionManager = new JpaTransactionManager();

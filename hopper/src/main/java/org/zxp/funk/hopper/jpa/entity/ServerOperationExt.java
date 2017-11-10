@@ -1,9 +1,6 @@
 package org.zxp.funk.hopper.jpa.entity;
 
-import javax.persistence.Entity;
-
 import org.springframework.beans.BeanUtils;
-import org.zxp.funk.hopper.jpa.entity.ServerOperation;
 
 //@Entity
 public class ServerOperationExt extends ServerOperation {
