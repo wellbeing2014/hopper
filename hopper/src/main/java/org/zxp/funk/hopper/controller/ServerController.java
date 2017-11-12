@@ -268,5 +268,22 @@ public class ServerController {
 		}
 		return ret;
 	}
+	@RequestMapping({"verifiPort.json"})
+	@ResponseBody
+	public HopperBaseReturn verifiPort(@RequestParam(value="port")int port) {
+		
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			ret.setSuccess(true);
+			ret.setRetObj(ss.verifyPort(port));
+			ret.setMsg("所有操作返回成功");
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("抱歉，服务未能返回数据。");
+			ret.setErrorDetail(e.getMessage());
+			logger.error("查询历史操作错误!",e);
+		}
+		return ret;
+	}
 }
 

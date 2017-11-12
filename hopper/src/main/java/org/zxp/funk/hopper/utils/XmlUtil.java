@@ -134,10 +134,11 @@ public class XmlUtil {
         }
     }
     public static Document parseByPath(String xmlpath) throws Exception{
+    	File file = new File(xmlpath);
     	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setIgnoringElementContentWhitespace(true);
     	  DocumentBuilder db = dbf.newDocumentBuilder();
-          return db.parse("file:///"+xmlpath);
+          return db.parse("file:///"+file.getAbsolutePath());
     }
 
     public static String getAttribute(Element element, String name, String defaultVal) {

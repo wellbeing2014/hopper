@@ -144,9 +144,20 @@
             //自定义验证规则
             form.verify({
                 port:function (value) {
-                  if(8000==value) {
-                      return "8000 已经占用";
-                  }
+                	var isAvaliable = false;
+                	req({
+                        url:'./server/verifiPort.json',
+                        method:'GET',
+                        data:{"port":value},
+                        async:false,
+                        success:function (ret) {
+                        	  isAvaliable = ret.retObj;
+                        }
+                    });
+                	if(!isAvaliable){
+                		return value+"端口被占用，请尝试其他端口。";
+                	}
+                		
                 },
                 title: function(value) {
                     if (value.length < 5) {

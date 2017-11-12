@@ -30,8 +30,8 @@
 
 	<root level="info">
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="file" />
 	</root>
 	
-	<logger name="org.zxp.funk.hopper" level="debug"/>
 
 </configuration>
