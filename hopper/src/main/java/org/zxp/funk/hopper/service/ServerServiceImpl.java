@@ -138,8 +138,8 @@ public class ServerServiceImpl implements ServerService {
 	}
 	
 	@Override
-	public boolean verifyPort(int port) {
-		int record = serverrep.countPortExists(port);
+	public boolean verifyPort(int port,String serverid) {
+		int record = serverrep.countPortExists(port,serverid);
 		
 		return record==0;
 	}

@@ -270,12 +270,12 @@ public class ServerController {
 	}
 	@RequestMapping({"verifiPort.json"})
 	@ResponseBody
-	public HopperBaseReturn verifiPort(@RequestParam(value="port")int port) {
+	public HopperBaseReturn verifiPort(@RequestParam(value="port")int port,@RequestParam(value="serverid")String serverid) {
 		
 		HopperBaseReturn ret = new HopperBaseReturn();
 		try{
 			ret.setSuccess(true);
-			ret.setRetObj(ss.verifyPort(port));
+			ret.setRetObj(ss.verifyPort(port,serverid));
 			ret.setMsg("所有操作返回成功");
 		}catch(Exception e){
 			ret.setSuccess(false);

@@ -26,5 +26,5 @@ public interface ServerService {
 	public Page<OperationLog> getOperationLogsByPage1(int pageCout,int pageno);
 	public List<OperationLog> getOperationLogsByPage2(int pageCout,int pageno);
 	
-	public boolean verifyPort(int port);
+	public boolean verifyPort(int port,String serverid);
 }

@@ -112,7 +112,8 @@
                 repeater = layui.repeater,
                 req=layui.request
                 editor = layui.layedit,
-                utils = layui.utils;
+                utils = layui.utils,
+                id = utils.getParameter('id');
 
 
             //顺序请求form绑定项
@@ -148,7 +149,7 @@
                 	req({
                         url:'./server/verifiPort.json',
                         method:'GET',
-                        data:{"port":value},
+                        data:{"port":value,"serverid":id},
                         async:false,
                         success:function (ret) {
                         	  isAvaliable = ret.retObj;
@@ -178,9 +179,9 @@
                 }, ready: function (e) {
                 }
             });
-            if(utils.getParameter('id')!=null){
+            if(id!=null){
                 req({
-                    url:'/server/getServer.json?serverid='+utils.getParameter('id'),
+                    url:'/server/getServer.json?serverid='+id,
                     method:'GET',
                     async:false,
                     success:function (ret) {
