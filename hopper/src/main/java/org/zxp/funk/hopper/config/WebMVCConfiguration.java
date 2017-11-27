@@ -16,6 +16,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -33,15 +34,16 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 	public void configureDefaultServletHandling(
 	        DefaultServletHandlerConfigurer configurer) {
 	    configurer.enable();
+	    
 	}
 	
 	// add the resolver
 	@Bean
 	public InternalResourceViewResolver internalResourceViewResolver() {
 	    InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-	    resolver.setPrefix("/WEB-INF/views/");
-	    resolver.setSuffix(".jsp");
-	    resolver.setRedirectHttp10Compatible(false);
+//	    resolver.setPrefix("/WEB-INF/views/");
+//	    resolver.setSuffix(".jsp");
+	    resolver.setRedirectHttp10Compatible(true);
 	    return resolver;
 	}
 	
@@ -94,9 +96,9 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
         return props;
     }
     
-    /*@Override
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
-    	registry.addInterceptor(new CommonInterceptor());
-    }*/
+    	registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/server/*");
+    }
 
 }

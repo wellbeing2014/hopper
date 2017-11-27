@@ -3,11 +3,11 @@ package hopper;
 import java.nio.charset.Charset;
 
 import org.zxp.funk.hopper.core.HopperException;
-import org.zxp.funk.hopper.core.TomcatExecutor;
-import org.zxp.funk.hopper.core.TomcatLogEventListener;
-import org.zxp.funk.hopper.core.TomcatLogEventObject;
-import org.zxp.funk.hopper.core.TomcatStatusEventListener;
-import org.zxp.funk.hopper.core.TomcatStatusEventObject;
+import org.zxp.funk.hopper.core.HopperLogEventListener;
+import org.zxp.funk.hopper.core.HopperLogEventObject;
+import org.zxp.funk.hopper.core.HopperStatusEventListener;
+import org.zxp.funk.hopper.core.HopperStatusEventObject;
+import org.zxp.funk.hopper.core.tomcat.TomcatExecutor;
 
 public class TestRun {
 	public static void main(String args[]) throws HopperException
@@ -16,29 +16,29 @@ public class TestRun {
 		TomcatExecutor tomcat = new TomcatExecutor();
 		tomcat.setTomcatHome("D:/Develop/Apache/Tomcat/apache-tomcat-7.0.73");
 		tomcat.setJavaHome("D:/Develop/Java/jdk1.7.0_71");
-		tomcat.addTomcatLogEventListener(new TomcatLogEventListener() {
+		tomcat.addLogEventListener(new HopperLogEventListener() {
 			
 			@Override
-			public void logEvent(TomcatLogEventObject obj) {
+			public void logEvent(HopperLogEventObject obj) {
 				System.out.println(obj.log);
 			}
 		});
-		tomcat.addTomcatStatusEventListener(new TomcatStatusEventListener() {
+		tomcat.addStatusEventListener(new HopperStatusEventListener() {
 			
 			@Override
-			public void statusChanged(TomcatStatusEventObject obj) {
+			public void statusChanged(HopperStatusEventObject obj) {
 				switch(obj.status){
 					case STARTED:
-						System.out.println("ÕýÔÚÆô¶¯");
+						System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 						break;
 					case RUNNING:
-						System.out.println("ÔËÐÐÖÐ");
+						System.out.println("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½");
 						break;
 					case SHUTDOWN:
-						System.out.println("ÕýÔÚÍ£Ö¹");
+						System.out.println("ï¿½ï¿½ï¿½ï¿½Í£Ö¹");
 						break;
 					case STOPPED:
-						System.out.println("ÒÑÍ£Ö¹");
+						System.out.println("ï¿½ï¿½Í£Ö¹");
 						break;
 				}
 			}

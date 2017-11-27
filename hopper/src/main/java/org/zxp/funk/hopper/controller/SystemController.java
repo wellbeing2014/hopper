@@ -117,7 +117,7 @@ public class SystemController {
 			ret.setSuccess(false);
 			ret.setMsg("抱歉，未能返回数据。");
 			ret.setErrorDetail(e.getMessage());
-			logger.error("获取tomcat错误："+e.getMessage());
+			logger.error("获取tomcat错误：",e);
 		}
 		return ret;
 		
@@ -158,7 +158,7 @@ public class SystemController {
 			ret.setSuccess(false);
 			ret.setMsg("保存失败");
 			ret.setErrorDetail(e.getMessage());
-			logger.error("保存JDK失败："+e.getMessage());
+			logger.error("保存JDK失败：",e);
 		}
 		return ret;
 	}

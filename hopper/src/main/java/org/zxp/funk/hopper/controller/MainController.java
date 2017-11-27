@@ -3,14 +3,13 @@ package org.zxp.funk.hopper.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.annotation.SubscribeMapping;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.zxp.funk.hopper.config.MyUserDetails;
 
 @Controller
 @RequestMapping({""})
@@ -19,6 +18,12 @@ public class MainController {
 	@Value("${version}")
 	private String version;
 	
+	
+	
+	@Value("${sys.login.username}")
+	private String username;
+	@Value("${sys.login.password}")
+	private String password;
 	
 	@RequestMapping({"version.json"})
 	@ResponseBody
@@ -36,22 +41,6 @@ public class MainController {
 		return "index";
 	}
 	
-	@RequestMapping("/getUser.json")
-	@ResponseBody
-	public Map<String,String> getUser()
-	{
-		Map<String,String> map = new HashMap<String, String>();
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = null;
-        if (authentication != null) {
-            principal = authentication.getPrincipal();
-        }
-        if (principal != null && principal instanceof MyUserDetails ) {
-        	MyUserDetails user = (MyUserDetails)principal;
-        	map.put("realname", user.getRealname());
-        }
-        return map;
-    }
 	
 	
 	@SubscribeMapping("/topic/serverstatus")
@@ -59,5 +48,38 @@ public class MainController {
 	    System.out.println("订阅");
 	}
 	
+	
+	
+    /** 
+     * 退出系统 
+     * @param session 
+     *          Session 
+     * @return 
+     * @throws Exception 
+     */  
+    @RequestMapping(value="/logout")  
+    public String logout(HttpSession session) throws Exception{  
+        //清除Session  
+        session.invalidate();  
+          
+        return "redirect:hopper_login.html";  
+    } 
+    
+    @RequestMapping(value="/login")
+    @ResponseBody
+    public Map<String,Object> login(HttpSession session, String username,String password) {
+    	Map<String,Object> map = new HashMap<>();
+    	if(this.username.equals(username)&&this.password.equals(password)) {
+    		session.setAttribute("username", username);
+    		map.put("success", "true");
+    		map.put("location", "hopper.html");
+    	}
+    	else
+    	{
+    		map.put("success", false);
+    		map.put("msg", "用户名密码错误");
+    	}
+		return map;
+	}
 }
 

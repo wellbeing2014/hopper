@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="./plugins/font-awesome/css/font-awesome.min.css" media="all">
+    <style>
+        .info-box {
+            height: 85px;
+            background-color: white;
+            background-color: #ecf0f5;
+        }
+        
+        .info-box .info-box-icon {
+            border-top-left-radius: 2px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 2px;
+            display: block;
+            float: left;
+            height: 85px;
+            width: 85px;
+            text-align: center;
+            font-size: 45px;
+            line-height: 85px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .info-box .info-box-content {
+            padding: 5px 10px;
+            margin-left: 85px;
+        }
+        
+        .info-box .info-box-content .info-box-text {
+            display: block;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-transform: uppercase;
+        }
+        
+        .info-box .info-box-content .info-box-number {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+
+        .desc{
+        	 margin: 25px;
+        }
+        .desc a{
+        	 color:red;
+        }
+        .main {
+            margin-top: 25px;
+        }
+        
+        .main .layui-row {
+            margin: 10px 0;
+        }
+        .barbtn{
+        	margin-left:0px !important;
+        }
+        .layui-table-body .layui-table,.layui-table-header .layui-table{width: 100%;}
+		.layui-table-body.layui-table-main .layui-table-cell,.layui-table-header .layui-table-cell{white-space: pre-wrap;word-wrap: break-word; word-break: break-all; height: auto;}
+    </style>
+</head>
+
+<body>
+    <div class="layui-fluid main">
+      
+        
+        <div class="layui-row layui-layout layui-col-md12">
+
+                <div class="layui-btn-group addgroup">
+                    <button class="layui-btn" data-type="add">直接添加</button>
+                    <button class="layui-btn" data-type="copy">复制添加</button>
+                </div>
+
+                
+        </div>
+    </div>
+
+    
+    <script src="./plugins/layui/layui.js"></script>
+    
+    
+    <script>
+        layui.config({
+            base: 'LayR/hopper-js/',
+            version: '1.0.1'
+        }).use(['jquery','request','util'], function() {
+           	var $=layui.jquery,req=layui.request;
+        	//var layer = layui.layer;
+            $('.addgroup .layui-btn ,.serverOperate .layui-btn').on('click', function(){
+                var type = $(this).data('type');
+                active[type] ? active[type].call(this) : '';
+            });
+
+            var active = {
+                add: function(){
+                	req({
+                        url:'http://localhost:8081/server/allserver.json',
+                         method:'GET',
+                         success:function (ret) {
+                            console.log(ret.retObj);
+                         }
+                     });
+                },
+                copy: function(){
+                	var checkStatus = table.checkStatus('idTest')
+                	,data = checkStatus.data;
+                	if(!data[0]){ layer.msg('请选择一个服务');return}
+                    layer.open({
+                        title:"复制添加一个服务",
+                        type: 2,
+                        content: 'hopper_form.html?id='+data[0].serverid,
+                        shadeClose: true,
+                        shade: false,
+                        maxmin: true,
+                        area: ['900px', '90%'],
+                        scrollbar: false
+                    });
+                }
+            };
+           
+            
+        });
+    </script>
+</body>
+
+</html>

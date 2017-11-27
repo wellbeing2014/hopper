@@ -5,12 +5,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.Vector;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public abstract class HopperOutputSteam  extends OutputStream {
+public abstract class BaseOutputSteam  extends OutputStream {
 
 
     /** Initial buffer size. */
@@ -36,7 +33,7 @@ public abstract class HopperOutputSteam  extends OutputStream {
      * Creates a new instance of this class.
      * Uses the default level of 999.
      */
-    public HopperOutputSteam() {
+    public BaseOutputSteam() {
         this(999);
     }
 
@@ -45,7 +42,7 @@ public abstract class HopperOutputSteam  extends OutputStream {
      *
      * @param level loglevel used to log data written to this stream.
      */
-    public HopperOutputSteam(final int level) {
+    public BaseOutputSteam(final int level) {
         this.level = level;
     }
 
@@ -143,7 +140,6 @@ public abstract class HopperOutputSteam  extends OutputStream {
         try {
 			processLine(buffer.toString(charset));
 		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         buffer.reset();
@@ -166,16 +162,10 @@ public abstract class HopperOutputSteam  extends OutputStream {
      * @param logLevel the log level to use
      */
     private  ArrayBlockingQueue<String> cache;
-    
-    private String runningRegex;
-    
-    public void setRunningRegex(String runningRegex) {
-		this.runningRegex = runningRegex;
-	}
 
     private String charset="utf-8";
     
-	public HopperOutputSteam(int cacheSize,String charset) {
+	public BaseOutputSteam(int cacheSize,String charset) {
 		this(999);
 		this.cache=new ArrayBlockingQueue<String>(cacheSize);
 		this.charset =charset;
@@ -183,15 +173,9 @@ public abstract class HopperOutputSteam  extends OutputStream {
     
     
     protected void processLine(String line, int level) {
-    	notifyLogEvent(new HopperLogEventObject(this, line));
-    	boolean isRunning = Pattern.matches(runningRegex, line);
-    	if(isRunning) {
-    		Pattern pattern = Pattern.compile("\\d+");
-            Matcher matcher = pattern.matcher(line);
-            matcher.find();
-            changeRunning(Integer.valueOf(matcher.group()));
-    	}
     	while(!cache.offer(line)) cache.poll();
+    	
+    	handleLine(line);
     }
     
     public Iterator<String> getCache(){
@@ -199,29 +183,5 @@ public abstract class HopperOutputSteam  extends OutputStream {
     }
     
     
-    private Vector<HopperLogEventListener> logeventlist=new Vector<HopperLogEventListener>();
-    
-    
-    
-    
-    public void addTomcatLogEventListener(HopperLogEventListener listener){
-    	logeventlist.add(listener);
-    }
-    
-    public void removeTomcatLogEventListener(HopperLogEventListener listener){
-    	logeventlist.remove(listener);
-    }
-    
-   
-    
-    public void notifyLogEvent(HopperLogEventObject obj)  
-    {   
-         Iterator<HopperLogEventListener> it=logeventlist.iterator();  
-         while(it.hasNext())  
-         {  
-             it.next().logEvent(obj); 
-         }  
-    }  
-    
-    public  abstract void changeRunning(int i);
+    public  abstract void handleLine(String line);
 }

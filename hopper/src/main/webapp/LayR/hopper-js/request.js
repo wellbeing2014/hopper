@@ -41,7 +41,8 @@ layui.define(['jquery', 'layer'], function(exports){
             },
             success: function (resp)
             {
-                resp.success? settings.success && typeof settings.success == 'function' && settings.success(resp):settings.failure && typeof settings.failure == 'function' && settings.failure(resp)
+            	if(resp.status==302){ location.href = resp.location;}
+            	else {resp.success? settings.success && typeof settings.success == 'function' && settings.success(resp):settings.failure && typeof settings.failure == 'function' && settings.failure(resp)}
             },
             error: function ()
             {

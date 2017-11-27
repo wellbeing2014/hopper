@@ -1,7 +1,7 @@
 package hopper;
 
 import org.zxp.funk.hopper.core.HopperException;
-import org.zxp.funk.hopper.core.TomcatExecutor;
+import org.zxp.funk.hopper.core.tomcat.TomcatExecutor;
 
 public class TestStop {
 	public static void main(String args[]) throws HopperException

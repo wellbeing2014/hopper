@@ -112,7 +112,8 @@
                 repeater = layui.repeater,
                 req=layui.request
                 editor = layui.layedit,
-                utils = layui.utils;
+                utils = layui.utils,
+                id = utils.getParameter('id');
 
 
             //顺序请求form绑定项
@@ -144,9 +145,20 @@
             //自定义验证规则
             form.verify({
                 port:function (value) {
-                  if(8000==value) {
-                      return "8000 已经占用";
-                  }
+                	var isAvaliable = false;
+                	req({
+                        url:'./server/verifiPort.json',
+                        method:'GET',
+                        data:{"port":value,"serverid":id},
+                        async:false,
+                        success:function (ret) {
+                        	  isAvaliable = ret.retObj;
+                        }
+                    });
+                	if(!isAvaliable){
+                		return value+"端口被占用，请尝试其他端口。";
+                	}
+                		
                 },
                 title: function(value) {
                     if (value.length < 5) {
@@ -167,9 +179,9 @@
                 }, ready: function (e) {
                 }
             });
-            if(utils.getParameter('id')!=null){
+            if(id!=null){
                 req({
-                    url:'/server/getServer.json?serverid='+utils.getParameter('id'),
+                    url:'/server/getServer.json?serverid='+id,
                     method:'GET',
                     async:false,
                     success:function (ret) {

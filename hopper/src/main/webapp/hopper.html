@@ -33,7 +33,7 @@
                 </li>
                 <li class="layui-nav-item">
                     <a href="javascript:;">
-                        superadmin
+                        管理员
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:;" ><span>基本资料</span></a></dd>
@@ -53,31 +53,31 @@
                         <a class="" href="javascript:;"><i class="fa fa-plug" aria-hidden="true"></i><span> 终端管理</span></a>
                         <dl class="layui-nav-child">
                             <dd>
-                                <a href="javascript:;" kit-target data-options="{url:'hopper_main.html',icon:'&#xe6c6;',title:'本地服务 ',id:'1'}">
-                                    <i class="layui-icon">&#xe6c6;</i><span> 本地服务 </span></a>
+                                <a href="javascript:;" kit-target data-options="{url:'hopper_main.html',icon:'&#xe735;',title:'本地服务 ',id:'1'}">
+                                    <i class="layui-icon">&#xe735;</i><span> 本地服务 </span></a>
                             </dd>
                             
                             <dd>
-                                <a href="javascript:;" kit-target data-options="{url:'hopper_ops.html',icon:'&#xe6c6;',title:'操作日志',id:'3'}">
-                                    <i class="layui-icon">&#xe6c6;</i><span> 操作日志 </span></a>
+                                <a href="javascript:;" kit-target data-options="{url:'hopper_ops.html',icon:'&#xe60a;',title:'操作日志',id:'3'}">
+                                    <i class="layui-icon">&#xe60a;</i><span> 操作日志 </span></a>
                             </dd>
                             
-                            <dd>
-                                <a href="javascript:;" data-url="form.html" data-icon="fa-user" data-title="表单" kit-target data-id='2'>
+                            <!-- <dd>
+                                <a href="javascript:;" data-url="http://localhost:8081/hopper_main.html" data-icon="fa-user" data-title="表单" kit-target data-id='2'>
                                     <i class="fa fa-user" aria-hidden="true"></i><span> 远程终端 A</span></a>
-                            </dd>
+                            </dd> -->
                             
                         </dl>
                     </li>
                     <li class="layui-nav-item layui-nav-itemed">
-                        <a href="javascript:;"><i class="fa fa-plug" aria-hidden="true"></i><span> 系统管理</span></a>
+                        <a href="javascript:;"><i class="layui-icon">&#xe614;</i><span> 系统管理</span></a>
                         <dl class="layui-nav-child">
                             <dd><a href="javascript:;" kit-target data-options="{url:'hopper_jdk.html',icon:'&#xe658;',title:'JDK配置',id:'6'}">
-                                <i class="layui-icon">&#xe658;</i><span> JDK配置</span></a></dd>
+                                <i class="fa fa-coffee" aria-hidden="true"></i><span> JDK配置</span></a></dd>
                             <dd><a href="javascript:;" kit-target data-options="{url:'hopper_tomcat.html',icon:'&#xe658;',title:'容器配置',id:'7'}">
-                                <i class="layui-icon">&#xe658;</i><span> 容器配置</span></a></dd>
-                            <dd><a href="javascript:;" kit-target data-options="{url:'hopper_sys.html',icon:'&#xe658;',title:'全局配置',id:'50'}">
-                                <i class="layui-icon">&#xe658;</i><span> 全局配置</span></a></dd>
+                                <i class="fa fa-shield" aria-hidden="true"></i><span> 容器配置</span></a></dd>
+                            <!-- <dd><a href="javascript:;" kit-target data-options="{url:'hopper_sys.html',icon:'&#xe658;',title:'全局配置',id:'50'}">
+                                <i class="layui-icon">&#xe658;</i><span> 全局配置</span></a></dd> -->
                         </dl>
                     </li>
                 </ul>
@@ -91,13 +91,11 @@
         <div class="layui-footer">
             <!-- 底部固定区域 -->
             2017 &copy;
-            <a href="http://hopper.wisoft.com.cn/">hopper.wisoft.com.cn</a> MIT license
+            <a href="http://hopper.com.cn/">hopper.com.cn</a> MIT license
         </div>
     </div>
 
     <script src="./plugins/layui/layui.js"></script>
-    <script type="text/javascript" src="/hopper-res/lib/sockjs-1.1.1.js"></script>
-	<script type="text/javascript" src="/hopper-res/lib/stomp.js"></script>
     <script>
  
         var message;

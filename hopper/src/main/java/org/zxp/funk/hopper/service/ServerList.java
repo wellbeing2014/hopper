@@ -1,5 +1,6 @@
 package org.zxp.funk.hopper.service;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -14,12 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import org.zxp.funk.hopper.core.ServerBehavior;
-import org.zxp.funk.hopper.core.TomcatLogEventListener;
-import org.zxp.funk.hopper.core.TomcatLogEventObject;
-import org.zxp.funk.hopper.core.TomcatStatus;
-import org.zxp.funk.hopper.core.TomcatStatusEventListener;
-import org.zxp.funk.hopper.core.TomcatStatusEventObject;
+import org.zxp.funk.hopper.core.HopperLogEventListener;
+import org.zxp.funk.hopper.core.HopperLogEventObject;
+import org.zxp.funk.hopper.core.HopperStatusEventListener;
+import org.zxp.funk.hopper.core.HopperStatusEventObject;
+import org.zxp.funk.hopper.core.tomcat.TomcatBehavior;
 import org.zxp.funk.hopper.jpa.entity.OperationType;
 import org.zxp.funk.hopper.jpa.entity.ServerOperation;
 import org.zxp.funk.hopper.jpa.entity.TomcatServer;
@@ -34,7 +34,7 @@ import com.google.common.base.Strings;
 @Component
 public class ServerList {
 	private static Logger logger=LoggerFactory.getLogger("核心服务列表");
-	private   ConcurrentLinkedQueue<ServerBehavior> list = new ConcurrentLinkedQueue<ServerBehavior>();
+	private   ConcurrentLinkedQueue<TomcatBehavior> list = new ConcurrentLinkedQueue<TomcatBehavior>();
 	private   ConcurrentLinkedQueue<ServerStatus> cache = new ConcurrentLinkedQueue<ServerStatus>();
 	ReadWriteLock rwlock = new ReentrantReadWriteLock(); 
 	
@@ -58,6 +58,9 @@ public class ServerList {
 	
 	@PostConstruct
 	public void init() throws Exception{
+		logger.info("正在检测服务配置目录是否可用："+serverConfigDir);
+		File configdir = new File(serverConfigDir);
+		configdir.mkdirs();
 		logger.info("正在装填服务："+serverRep.count()+"条");
 		List<TomcatServer> serverlist = serverRep.findAll();
 		
@@ -69,18 +72,18 @@ public class ServerList {
 			}
 			if(Strings.isNullOrEmpty(server.getTomcat().getPath()))
 				server.setTomcat(scRep.findOne(server.getTomcat().getId()));
-			ServerBehavior sb = new ServerBehavior(server,serverConfigDir);
-			sb.addTomcatLogEventListener(new TomcatLogEventListener() {
+			TomcatBehavior sb = new TomcatBehavior(server,serverConfigDir);
+			sb.addLogEventListener(new HopperLogEventListener() {
 				@Override
-				public void logEvent(TomcatLogEventObject obj) {
+				public void logEvent(HopperLogEventObject obj) {
 					brokerMessagingTemplate.convertAndSend("/topic/serverlog/"+server.getServerid(), obj.log);
 				}
 			});
 			
-			sb.addTomcatStatusEventListener(new TomcatStatusEventListener() {
+			sb.addStatusEventListener(new HopperStatusEventListener() {
 				
 				@Override
-				public void statusChanged(TomcatStatusEventObject obj) {
+				public void statusChanged(HopperStatusEventObject obj) {
 					brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
 				}
 			});
@@ -88,7 +91,7 @@ public class ServerList {
 			list.add(sb);
 		}
 		flush();
-		logger.info("正在检测服务配置目录是否可用："+serverConfigDir);
+		
 	}
 	
 	public void flush(){
@@ -96,7 +99,7 @@ public class ServerList {
 		//if(rwlock.writeLock().tryLock()){
 		//	try{
 		cache.clear();
-		for(ServerBehavior sb:list){
+		for(TomcatBehavior sb:list){
 			cache.add(sb.status);
 		}
 			//}
@@ -123,28 +126,29 @@ public class ServerList {
 		}
 		if(Strings.isNullOrEmpty(server.getTomcat().getPath()))
 			server.setTomcat(scRep.findOne(server.getTomcat().getId()));
-		for(ServerBehavior sb_d:list){
+		for(TomcatBehavior sb_d:list){
 			if(sb_d.server.getServerid().equals(server.getServerid())){
 				sb_d.tomcatBaseDelete();
 				list.remove(sb_d);
 			}
 		}
-		ServerBehavior sb  =new ServerBehavior(server,serverConfigDir);
-		sb.addTomcatLogEventListener(new TomcatLogEventListener() {
+		server.setServerid(serverRep.save(server).getServerid());
+		TomcatBehavior sb  =new TomcatBehavior(server,serverConfigDir);
+		sb.addLogEventListener(new HopperLogEventListener() {
 			@Override
-			public void logEvent(TomcatLogEventObject obj) {
+			public void logEvent(HopperLogEventObject obj) {
 				brokerMessagingTemplate.convertAndSend("/topic/serverlog/"+server.getServerid(), obj.log);
 			}
 		});
-		sb.addTomcatStatusEventListener(new TomcatStatusEventListener() {
+		sb.addStatusEventListener(new HopperStatusEventListener() {
 			
 			@Override
-			public void statusChanged(TomcatStatusEventObject obj) {
+			public void statusChanged(HopperStatusEventObject obj) {
 				brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
 				
 			}
 		});
-		serverRep.save(server);
+		
 		list.add(sb);
 		flush();
 		brokerMessagingTemplate.convertAndSend("/topic/serverstatus", getAll());
@@ -160,8 +164,8 @@ public class ServerList {
 	 */
 	public boolean update(TomcatServer server) throws Exception{
 		
-		ServerBehavior update_o = null;
-		for(ServerBehavior sb_d:list){
+		TomcatBehavior update_o = null;
+		for(TomcatBehavior sb_d:list){
 			if(sb_d.server.getServerid().equals(server.getServerid())){
 				update_o = sb_d;
 			}
@@ -169,12 +173,14 @@ public class ServerList {
 		if(update_o.server.isCoreEdit(server))
 		{
 			
-			while(update_o.getExecutor().isRunning()) {
+			while(update_o.isRunning()) {
 				logger.info(update_o.server.getServername()+"-等待停止");
 				update_o.shutdown();
 				Thread.sleep(1500);
 				
 			}
+			update_o.tomcatBaseDelete();
+			update_o.server=server;
 			update_o.tomcatBaseInit();
 		}
 		update_o.resetServerStatus(server);
@@ -186,8 +192,8 @@ public class ServerList {
 	
 	public void shutdownForce(String id,String operator) throws Exception{
 		
-		ServerBehavior serverb= null;
-		for(ServerBehavior sb:list){
+		TomcatBehavior serverb= null;
+		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
 				serverb = sb;
 				break;
@@ -219,7 +225,7 @@ public class ServerList {
 	 * @return: boolean
 	 */
 	public boolean remove(TomcatServer server) throws Exception{
-		for(ServerBehavior sb_d:list){
+		for(TomcatBehavior sb_d:list){
 			if(sb_d.server.getServerid().equals(server.getServerid())){
 				sb_d.tomcatBaseDelete();
 				list.remove(sb_d);
@@ -231,8 +237,8 @@ public class ServerList {
 	}
 	public void startup(String id,String operator) throws Exception{
 		
-		ServerBehavior serverb= null;
-		for(ServerBehavior sb:list){
+		TomcatBehavior serverb= null;
+		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
 				serverb = sb;
 				break;
@@ -256,8 +262,8 @@ public class ServerList {
 	
 	public void shutdown(String id,String operator) throws Exception{
 		
-		ServerBehavior serverb= null;
-		for(ServerBehavior sb:list){
+		TomcatBehavior serverb= null;
+		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
 				serverb = sb;
 				break;
@@ -280,17 +286,5 @@ public class ServerList {
 		
 	}
 	
-	public void loghandle(String id,TomcatLogEventListener listener) throws Exception{
-		
-		ServerBehavior serverb= null;
-		for(ServerBehavior sb:list){
-			if(sb.server.getServerid().equals(id)){
-				serverb = sb;
-				break;
-			}
-		}
-		if(serverb==null) throw new Exception("未找到相应服务："+id);
-		serverb.addTomcatLogEventListener(listener);
-		
-	}
+	
 }

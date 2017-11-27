@@ -8,8 +8,8 @@ import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.ExecuteWatchdog;
-import org.zxp.funk.hopper.core.TomcatStatus;
-import org.zxp.funk.hopper.core.TomcatStatusEventObject;
+import org.zxp.funk.hopper.core.HopperStatus;
+import org.zxp.funk.hopper.core.HopperStatusEventObject;
 
 public class Exec {
 	

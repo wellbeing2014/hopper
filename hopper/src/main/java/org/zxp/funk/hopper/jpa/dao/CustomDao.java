@@ -24,6 +24,7 @@ public class CustomDao {
 	 * @return
 	 * @return: List<ServerOperation2>
 	 */
+	@SuppressWarnings("unchecked")
 	public List<ServerOperationExt> getOperations(){
 		try {
             List<ServerOperationExt> list;
@@ -45,6 +46,7 @@ public class CustomDao {
 	 * @return
 	 * @return: List<ServerOperation2>
 	 */
+	@SuppressWarnings("unchecked")
 	public List<OperationLog> getOperationsByPage(int countPerPage,int pageNo){
 		String dataSql = "select new org.zxp.funk.hopper.pojo.OperationLog(a,b.servername) from ServerOperation a ,TomcatServer b where a.serverid = b.serverid order by a.operationtime desc";
 		Query dataQuery = entityManager.createQuery(dataSql);

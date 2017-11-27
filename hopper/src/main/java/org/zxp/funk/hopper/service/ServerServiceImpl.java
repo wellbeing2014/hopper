@@ -137,4 +137,10 @@ public class ServerServiceImpl implements ServerService {
 		return operationRep.count();
 	}
 	
+	@Override
+	public boolean verifyPort(int port,String serverid) {
+		int record = serverrep.countPortExists(port,serverid);
+		
+		return record==0;
+	}
 }

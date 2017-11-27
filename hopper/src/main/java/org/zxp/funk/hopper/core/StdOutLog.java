@@ -26,7 +26,7 @@ public abstract class StdOutLog extends LogOutputStream {
     
     @Override
     protected void processLine(String line, int level) {
-    	notifyLogEvent(new TomcatLogEventObject(this, line));
+    	notifyLogEvent(new HopperLogEventObject(this, line));
     	boolean isRunning = Pattern.matches(runningRegex, line);
     	if(isRunning) {
     		Pattern pattern = Pattern.compile("\\d+");
@@ -42,24 +42,24 @@ public abstract class StdOutLog extends LogOutputStream {
     }
     
     
-    private Vector<TomcatLogEventListener> logeventlist=new Vector<TomcatLogEventListener>();
+    private Vector<HopperLogEventListener> logeventlist=new Vector<HopperLogEventListener>();
     
     
     
     
-    public void addTomcatLogEventListener(TomcatLogEventListener listener){
+    public void addTomcatLogEventListener(HopperLogEventListener listener){
     	logeventlist.add(listener);
     }
     
-    public void removeTomcatLogEventListener(TomcatLogEventListener listener){
+    public void removeTomcatLogEventListener(HopperLogEventListener listener){
     	logeventlist.remove(listener);
     }
     
    
     
-    public void notifyLogEvent(TomcatLogEventObject obj)  
+    public void notifyLogEvent(HopperLogEventObject obj)  
     {   
-         Iterator<TomcatLogEventListener> it=logeventlist.iterator();  
+         Iterator<HopperLogEventListener> it=logeventlist.iterator();  
          while(it.hasNext())  
          {  
              it.next().logEvent(obj); 

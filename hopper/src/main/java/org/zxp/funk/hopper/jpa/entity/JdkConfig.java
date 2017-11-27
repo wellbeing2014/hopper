@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
  
 @Entity
-@Table(name="conf_jdks")
+@Table(name="HPR_JDK")
 public class JdkConfig implements Serializable {
 	
 	
@@ -25,8 +25,10 @@ public class JdkConfig implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
+	//@GeneratedValue(generator = "uuid")
+    //@GenericGenerator(name = "uuid", strategy = "uuid")
+	@GenericGenerator(name="systemUUID",strategy="uuid")
+	@GeneratedValue(generator="systemUUID")
     //@Column(columnDefinition = "CHAR(32)")
     @Column(name = "ID")
 	@Id
