@@ -171,7 +171,7 @@ public class ServerController {
 	 * @Title: 操作类
 	 * @Description: 对服务进行起停操作
 	 * @param id
-	 * @param type 1：启动 2：关闭
+	 * @param type 1：启动 2：关闭 8:推送缓存日志 9：强制关闭
 	 * @return
 	 * @return: HopperBaseReturn
 	 */
@@ -191,6 +191,9 @@ public class ServerController {
 				break;
 			case 2:
 				ss.shutdown(id,ip);
+				break;
+			case 8:
+				ss.pushCacheLogs(id);
 				break;
 			case 9:
 				ss.shutdownForce(id, ip);

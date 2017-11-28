@@ -39,10 +39,18 @@
     <fieldset class="layui-elem-field layui-field-title">
         <legend>日志查看 - 服务名称</legend>
         <div class="layui-field-box ">
+        	 <div class="layui-fluid" >
+	        	<div class="layui-btn-group  extOperate">
+	                    <button class="layui-btn layui-btn-primary layui-btn-small" data-type="cachelog">缓存日志</button>
+	                    <button class="layui-btn layui-btn-primary layui-btn-small" data-type="forceshut">强制停止</button>
+	                </div>
+	            </div>
             <div class="layui-fluid tool" >
+            	
                 <form class="layui-form" action="">
                    	
                     <div class="layui-inline">
+                    		 
 	                    <div class="layui-input-inline" style="width: 250px;">
 	                        <input id="searchIpt" style="height: 32px" type="text" name="searchIpt" value="\b.*Exception\b|警告|错误|error" placeholder="高亮关键字，多个可以用“|”分隔 "  autocomplete="off" class="layui-input">
 	                    </div>
@@ -53,6 +61,7 @@
 	                        <input id="scrollCtrl" type="checkbox" name="" lay-skin="switch" title="滚动" checked lay-text="滚动|不滚">
 	                    </div>
                     </div>
+                    
                     <a id="clear" class="layui-btn  layui-btn-radius layui-btn-danger layui-btn-small">清屏</a>
                 </form>
             </div>
@@ -73,10 +82,10 @@
     layui.config({
         base: 'LayR/hopper-js/',
         version: '1.0.1'
-    }).use(['form','websocket','utils'], function() {
+    }).use(['form','websocket','request','utils'], function() {
         var $ = layui.jquery,
         utils = layui.utils,
-        form = layui.form;
+        form = layui.form,req=layui.request;
         //修改标题
         var name = utils.getParameter('name');
         if(name){
@@ -112,9 +121,7 @@
         }
         
         form.on('switch(highLight)', function (data) {
-        	layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
-        	      offset: '6px'
-        	    });
+        	
             if(data.elem.checked){
             	$('#searchIpt').parent().show();
             }
@@ -123,9 +130,51 @@
             }
         });
         
+        form.on('submit(*)',function(data){
+			return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+		})
+        
         $('#clear').on('click',function (dat) {
             $('#codelist').html('');
         });
+        
+        
+        $('.extOperate .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+        
+        var active = {
+        		forceshut: function(){
+        			req({
+                        url:'/server/operate.json',
+                        method:'GET',
+                        data:{'id':id,'type':9},
+                        success:function (ret) {
+                       	 layer.msg(ret.msg, {
+                      		  icon: 1,
+                      		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                      		});
+                        }
+                    }); 
+                },
+                cachelog: function(){
+                	$('#codelist').html('');
+        			req({
+                        url:'/server/operate.json',
+                        method:'GET',
+                        data:{'id':id,'type':8},
+                        success:function (ret) {
+                       	 layer.msg(ret.msg, {
+                      		  icon: 1,
+                      		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                      		});
+                        }
+                    }); 
+                }
+        };
+        
+        
     });
 </script>
 

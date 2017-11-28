@@ -1,7 +1,9 @@
 package org.zxp.funk.hopper.core.tomcat;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -48,7 +50,7 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     private boolean running = false;
     public TomcatExecutor() {
         super();
-        this.setStreamHandler(new PumpStreamHandler(stdOutLog));
+        //this.setStreamHandler(new PumpStreamHandler(stdOutLog));
         this.setWatchdog(watchdog);
         handler =new DefaultExecuteResultHandler(){
 			@Override
@@ -138,11 +140,10 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     	environment.put("CLASSPATH", ".;%JAVA_HOME%/lib;%JAVA_HOME%/lib/tools.jar");
     }
     
-    public void setTomcatPort(int port){
-    	
-    }
 
     public void startup() throws HopperException{
+    	notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 正在执行启动操作。"));
+    	this.setStreamHandler(new PumpStreamHandler(stdOutLog));
     	validateEnv();
     	try {
     		running = true;
@@ -155,6 +156,8 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     }
     
     public void shutdown() throws HopperException{
+    	notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 正在执行停止操作。"));
+    	this.setStreamHandler(new PumpStreamHandler(stdOutLog));
     	validateEnv();
     	try {
     		running = true;
@@ -163,20 +166,109 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
 		} catch (Exception e){
 			throw new HopperException("00102","关闭服务失败"+e.getMessage());
 		}
-    	
     }
     
-    public void shutdownForce(int port) throws HopperException{
-    	CommandLine killprogress = new CommandLine("netstat");
-    	killprogress.addArgument("-aon |findstr");
-    	killprogress.addArgument(port+"");
-    	try {
-			execute(killprogress, environment,handler);
-			notifyTomcatStatus(new HopperStatusEventObject(this, HopperStatus.SHUTDOWN));
-		} catch (Exception e){
-			throw new HopperException("00103","强制关闭服务失败"+e.getMessage());
-		}
+    
+    
+    protected synchronized void killprogress(int pid) throws Exception{
+    	isKill = false;
+    	this.setStreamHandler(new PumpStreamHandler(new BaseOutputSteam(100,"gbk") {
+    		@Override
+    		public void handleLine(String line) {
+    			notifyLogEvent(new HopperLogEventObject(this, line));
+    		}
+    	}));
+    	CommandLine cl = new CommandLine("taskkill");
+    	cl.addArgument("/F");
+    	cl.addArgument("/PID");
+    	cl.addArgument(""+pid);
+    	environment.put("PATH", "C:\\Windows\\system32");
     	
+		execute(cl, environment,new DefaultExecuteResultHandler() {
+			@Override
+			public void onProcessComplete(int exitValue) {
+				super.onProcessComplete(exitValue);
+				isKill = true;
+				notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 进程PID["+pid+"]成功杀死。"));
+			}
+			
+			@Override
+			public void onProcessFailed(ExecuteException e) {
+				super.onProcessFailed(e);
+				isKill = true;
+				notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 进程PID["+pid+"]杀不死它:"+e.getMessage()));
+			}
+		});
+		
+		while(!isKill) {
+			Thread.sleep(1000);
+		}
+			
+    }
+    
+    boolean isKill = false;
+    boolean isFind = false;
+    protected synchronized int findPids(int port) throws Exception {
+    	List<String[]> netstat = new ArrayList<>();
+    	Pattern pattern = Pattern.compile("\\S+");
+    	isFind = false;
+    	this.setStreamHandler(new PumpStreamHandler(new BaseOutputSteam(100,"gbk") {
+    		@Override
+    		public void handleLine(String line) {
+    			notifyLogEvent(new HopperLogEventObject(this, line));
+    			Matcher matcher = pattern.matcher(line);
+    			String XieYi = "";
+    			String BenDi = "";
+    			String WaiBu = "";
+    			String ZhuangT = "";
+    			String PID = "";
+    			if(matcher.find()) XieYi = matcher.group();
+    			if(matcher.find()) BenDi = matcher.group();
+    			if(matcher.find()) WaiBu = matcher.group();
+    			if(matcher.find()) ZhuangT = matcher.group();
+    			if(matcher.find()) PID = matcher.group();
+    			netstat.add(new String[] {XieYi,BenDi,WaiBu,ZhuangT,PID});
+    		}
+    	}));
+    	CommandLine cl = new CommandLine("cmd");
+    	cl.addArgument("/C");
+    	cl.addArgument("netstat -aon|findstr "+port);
+    	environment.put("PATH", "C:\\Windows\\system32");
+		execute(cl, environment,new DefaultExecuteResultHandler(){
+			@Override
+			public void onProcessComplete(int exitValue) {
+				super.onProcessComplete(exitValue);
+				isFind = true;
+			}
+			
+			@Override
+			public void onProcessFailed(ExecuteException e) {
+				super.onProcessFailed(e);
+				isFind = true;
+			}
+		});
+		
+		while(!isFind) {
+			Thread.sleep(1000);
+		}
+		
+		int ret = 0;
+    	for(String[] progress:netstat) {
+    		boolean got = ("TCP".equals(progress[0]))
+    				&&("LISTENING".equals(progress[3]))
+    				&&(("0.0.0.0:"+port).equals(progress[1]));
+    		if(got) ret = Integer.parseInt(progress[4]);
+    		else continue;
+    	}
+    	return ret;
+    }
+    
+    
+    public void shutdownForce(int port) throws Exception{
+    	notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 正在通过杀进程的方式强制停止端口["+port+"]"));
+    	int pid = findPids(port);
+    	notifyLogEvent(new HopperLogEventObject(this, "[HOPPER] 找到端口["+port+"]所在的进程PID["+pid+"]"));
+    	killprogress(pid);
     }
     
    
@@ -206,5 +298,14 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
 		return running;
 	}
     
+	@Override
+	public void  cacheLogs() {
+		
+		Iterator<String> logs = stdOutLog.getCache();
+		while(logs.hasNext())
+		{
+			notifyLogEvent(new HopperLogEventObject(this, logs.next()));
+		}
+	}
 
 }

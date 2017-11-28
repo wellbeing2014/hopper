@@ -19,6 +19,7 @@ import org.zxp.funk.hopper.core.HopperLogEventListener;
 import org.zxp.funk.hopper.core.HopperLogEventObject;
 import org.zxp.funk.hopper.core.HopperStatusEventListener;
 import org.zxp.funk.hopper.core.HopperStatusEventObject;
+import org.zxp.funk.hopper.core.IhopperExecutor;
 import org.zxp.funk.hopper.core.tomcat.TomcatBehavior;
 import org.zxp.funk.hopper.jpa.entity.OperationType;
 import org.zxp.funk.hopper.jpa.entity.ServerOperation;
@@ -258,6 +259,20 @@ public class ServerList {
 		serverb.addOnceOpr(oprtime);
 		flush();
 		serverb.startup();
+	}
+	
+	public IhopperExecutor getExecutor(String serverid) throws Exception {
+		
+		TomcatBehavior serverb= null;
+		for(TomcatBehavior sb:list){
+			if(sb.server.getServerid().equals(serverid)){
+				serverb = sb;
+				break;
+			}
+		}
+		if(serverb==null) throw new Exception("未找到相应服务："+serverid);
+		
+		return serverb;
 	}
 	
 	public void shutdown(String id,String operator) throws Exception{

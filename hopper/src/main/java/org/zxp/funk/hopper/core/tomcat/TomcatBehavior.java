@@ -41,7 +41,20 @@ public class TomcatBehavior extends TomcatExecutor {
 	private static String TOMCAT_BASE_CONF_DIR = "conf";
 	
 	public TomcatBehavior(TomcatServer instance,String confBaseDir) throws HopperException{
-		
+		super();
+		int pid = 0;
+		try {
+			pid = findPids(instance.getMainport());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if(pid>0) {
+			try {
+				killprogress(pid);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		resetServerStatus(instance);
 		this.confBaseDir = confBaseDir;
 		
@@ -173,7 +186,11 @@ public class TomcatBehavior extends TomcatExecutor {
 	}
 	
 	public void shutdownForce() throws HopperException {
-		shutdownForce(server.getMainport());
+		try {
+			shutdownForce(server.getMainport());
+		} catch (Exception e) {
+			throw new HopperException("01005", "强制停止端口["+server.getMainport()+"]失败："+e.getMessage());
+		}
 	}
 	
 	public HopperStatus getCurrentStatus() {

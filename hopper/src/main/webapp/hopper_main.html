@@ -301,7 +301,7 @@
                     	req({
                             url:'/server/operate.json',
                              method:'GET',
-                             data:{'id':data.serverid,'type':2},
+                             data:{'id':data.serverid,'type':9},
                              success:function (ret) {
                             	 layer.msg(ret.msg, {
                            		  icon: 1,
@@ -448,7 +448,7 @@
                     		req({
                                 url:'/server/operate.json',
                                  method:'GET',
-                                 data:{'id':data[i].serverid,'type':2}
+                                 data:{'id':data[i].serverid,'type':9}
                              });
                     	}
 	                   	layer.msg('批量停止完成，系统也不清楚有多少停止成功，请自行检查', {

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zxp.funk.hopper.core.IhopperExecutor;
 import org.zxp.funk.hopper.jpa.dao.CustomDao;
 import org.zxp.funk.hopper.jpa.entity.OperationType;
 import org.zxp.funk.hopper.jpa.entity.ServerOperation;
@@ -52,6 +53,13 @@ public class ServerServiceImpl implements ServerService {
 	@Override
 	public void shutdownForce(String id,String operator) throws Exception{
 		serverlist.shutdownForce(id, operator);
+	}
+	
+	@Override
+	public void pushCacheLogs(String serverid) throws Exception {
+		
+		IhopperExecutor executor = serverlist.getExecutor(serverid);
+		executor.cacheLogs();
 	}
 
 	@Override

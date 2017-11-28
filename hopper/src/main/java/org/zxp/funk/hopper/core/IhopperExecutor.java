@@ -7,4 +7,6 @@ public interface IhopperExecutor  {
 	public void shutdown() throws Exception;
 	
 	public boolean isRunning();
+	
+	public void cacheLogs();
 }

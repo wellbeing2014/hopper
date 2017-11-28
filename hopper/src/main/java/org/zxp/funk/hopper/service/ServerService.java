@@ -27,4 +27,6 @@ public interface ServerService {
 	public List<OperationLog> getOperationLogsByPage2(int pageCout,int pageno);
 	
 	public boolean verifyPort(int port,String serverid);
+	
+	public void pushCacheLogs(String serverid) throws Exception;
 }
