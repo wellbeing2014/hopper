@@ -104,7 +104,7 @@ public class TomcatBehavior extends TomcatExecutor {
 		File tomcatbase = new File(server.getTomcat().getPath()+File.separator+TOMCAT_BASE_CONF_DIR);
 		if(!tomcatbase.exists()) throw new HopperException("01001","TOMCAT_BASE 配置不存在！");
 		File alreadyConfDir = new File(confDir);
-		if(alreadyConfDir.exists()) tomcatBaseDelete();
+		if(!alreadyConfDir.exists()) {
 		try {
 			copyBaseConf(tomcatbase,confDir);
 			File tmpfile = new File(confDir+File.separator+"temp");
@@ -139,6 +139,8 @@ public class TomcatBehavior extends TomcatExecutor {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new HopperException("01003","TOMCAT_BASE 解析配置错误："+e.getMessage());
+		}
+        
 		}
         
         setTomcatHome(server.getTomcat().getPath());

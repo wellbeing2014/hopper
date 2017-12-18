@@ -123,7 +123,7 @@ public class SystemMetricThread implements DisposableBean, Runnable {
      *
      */
     private Map<String,Object>  getDisk() {
-    	Map<String,Object> diskm = new HashMap<>();
+    	final Map<String,Object> diskm = new HashMap<>();
     	String[] disks = disk.split("\\|");
     	try {
             for(String pan:disks) {
@@ -170,7 +170,7 @@ public class SystemMetricThread implements DisposableBean, Runnable {
     		
     	}
     	
-    	String str = "接收"+df.format(rxbps) +"kb | 上传"+df.format(txbps)+"kb";
+    	final String str = "接收"+df.format(rxbps) +"kb | 发送"+df.format(txbps)+"kb";
     	return new HashMap<String,Object>(){
 			private static final long serialVersionUID = 1L;
 			{

@@ -38,7 +38,7 @@ public class MainController {
 	@RequestMapping("/")
 	public String index()
 	{
-		return "index";
+		return "redirect:/hopper.html";
 	}
 	
 	

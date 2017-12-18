@@ -65,7 +65,7 @@ public class ServerList {
 		logger.info("正在装填服务："+serverRep.count()+"条");
 		List<TomcatServer> serverlist = serverRep.findAll();
 		
-		for(TomcatServer server:serverlist){
+		for(final TomcatServer server:serverlist){
 			
 			if(server.getTomcat()==null||Strings.isNullOrEmpty(server.getTomcat().getId())) {
 				logger.error("无法获取TOMCAT_HOME,serverid:"+server.getServerid());
@@ -120,7 +120,7 @@ public class ServerList {
 	 * @throws Exception
 	 * @return: boolean
 	 */
-	public boolean add(TomcatServer server) throws Exception{
+	public boolean add(final TomcatServer server) throws Exception{
 		if(server.getTomcat()==null||Strings.isNullOrEmpty(server.getTomcat().getId())) {
 			logger.error("无法获取TOMCAT_HOME,serverid:"+server.getServerid());
 			throw new Exception("无法获取TOMCAT_HOME,serverid:"+server.getServerid());

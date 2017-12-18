@@ -170,7 +170,7 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     
     
     
-    protected synchronized void killprogress(int pid) throws Exception{
+    protected synchronized void killprogress(final int pid) throws Exception{
     	isKill = false;
     	this.setStreamHandler(new PumpStreamHandler(new BaseOutputSteam(100,"gbk") {
     		@Override
@@ -209,8 +209,8 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     boolean isKill = false;
     boolean isFind = false;
     protected synchronized int findPids(int port) throws Exception {
-    	List<String[]> netstat = new ArrayList<>();
-    	Pattern pattern = Pattern.compile("\\S+");
+    	final List<String[]> netstat = new ArrayList<>();
+    	final Pattern pattern = Pattern.compile("\\S+");
     	isFind = false;
     	this.setStreamHandler(new PumpStreamHandler(new BaseOutputSteam(100,"gbk") {
     		@Override

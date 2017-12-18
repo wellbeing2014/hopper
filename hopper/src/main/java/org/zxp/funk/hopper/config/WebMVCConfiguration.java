@@ -69,7 +69,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
     
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("index");
+        //registry.addViewController("/").setViewName("hopper.html");
     }    
     
     @Override
