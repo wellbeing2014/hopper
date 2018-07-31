@@ -20,8 +20,7 @@ import org.zxp.funk.hopper.core.HopperLogEventObject;
 import org.zxp.funk.hopper.core.HopperStatusEventListener;
 import org.zxp.funk.hopper.core.HopperStatusEventObject;
 import org.zxp.funk.hopper.core.IhopperExecutor;
-import org.zxp.funk.hopper.core.tomcat.TomcatBehavior;
-import org.zxp.funk.hopper.jpa.entity.OperationType;
+import org.zxp.funk.hopper.core.tomcat.TomcatBehavior;import org.zxp.funk.hopper.jpa.entity.OperationType;
 import org.zxp.funk.hopper.jpa.entity.ServerOperation;
 import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.jpa.repository.JdkConfigRepository;
@@ -79,6 +78,7 @@ public class ServerList {
 			}
 			if(Strings.isNullOrEmpty(server.getTomcat().getPath()))
 				server.setTomcat(scRep.findOne(server.getTomcat().getId()));
+
 			TomcatBehavior sb = new TomcatBehavior(server,serverConfigDir);
 			sb.addLogEventListener(new HopperLogEventListener() {
 				@Override
@@ -139,10 +139,8 @@ public class ServerList {
 				list.remove(sb_d);
 			}
 		}
-		server.setServerid(serverRep.save(server).getServerid());
 		TomcatBehavior sb  =new TomcatBehavior(server,serverConfigDir);
-		sb.addLogEventListener(new HopperLogEventListener() {
-			@Override
+		sb.addLogEventListener(new HopperLogEventListener() {			@Override
 			public void logEvent(HopperLogEventObject obj) {
 				brokerMessagingTemplate.convertAndSend("/topic/serverlog/"+server.getServerid(), obj.log);
 			}
@@ -155,6 +153,7 @@ public class ServerList {
 				
 			}
 		});
+
 		
 		list.add(sb);
 		flush();
@@ -171,6 +170,7 @@ public class ServerList {
 	 */
 	public boolean update(TomcatServer server) throws Exception{
 		
+
 		TomcatBehavior update_o = null;
 		for(TomcatBehavior sb_d:list){
 			if(sb_d.server.getServerid().equals(server.getServerid())){
@@ -198,7 +198,6 @@ public class ServerList {
 	}
 	
 	public void shutdownForce(String id,String operator) throws Exception{
-		
 		TomcatBehavior serverb= null;
 		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
@@ -243,7 +242,6 @@ public class ServerList {
 		return true;
 	}
 	public void startup(String id,String operator) throws Exception{
-		
 		TomcatBehavior serverb= null;
 		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
@@ -282,7 +280,6 @@ public class ServerList {
 	}
 	
 	public void shutdown(String id,String operator) throws Exception{
-		
 		TomcatBehavior serverb= null;
 		for(TomcatBehavior sb:list){
 			if(sb.server.getServerid().equals(id)){
@@ -306,6 +303,5 @@ public class ServerList {
 		serverb.shutdown();
 		
 	}
-	
 	
 }

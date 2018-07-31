@@ -16,6 +16,7 @@ public enum HopperStatus {
 		return this.status;
 	}
 	
+
 	 public static HopperStatus parse(String status) {
 		 HopperStatus plat = HopperStatus.FORBIDDEN; // Default
         for (HopperStatus item : HopperStatus.values()) {
