@@ -1,15 +1,27 @@
 package org.zxp.funk.hopper.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.zxp.funk.hopper.core.HopperException;
 import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.pojo.OperationLog;
@@ -26,9 +38,11 @@ public class ServerController {
 	
 	@Autowired
 	private  WebUtil webutil;
+	
+	@Value("${server.war.dir}")
+	String serverWarDir;
 	/**
 	 * @Title: 服务列表页
-	 * @Description: TODO
 	 * @return
 	 * @return: String
 	 */
@@ -41,7 +55,6 @@ public class ServerController {
 	
 	/**
 	 * @Title: 服务编辑页
-	 * @Description: TODO
 	 * @return
 	 * @return: String
 	 */
@@ -53,7 +66,6 @@ public class ServerController {
 	
 	/**
 	 * @Title: 根据ID获取一个服务的详细信息
-	 * @Description: TODO
 	 * @param id
 	 * @return
 	 * @return: HopperBaseReturn
@@ -138,7 +150,7 @@ public class ServerController {
 			else
 				ret.setMsg("抱歉，服务未能修改成功，请查看详细原因~");
 			ret.setErrorDetail(HopperException.getStackTrace(e));
-			logger.error("添加服务错误：",e);
+			logger.error("添加修改服务错误：",e);
 		}
 		return ret;
 	}
@@ -271,6 +283,7 @@ public class ServerController {
 		}
 		return ret;
 	}
+	
 	@RequestMapping({"verifiPort.json"})
 	@ResponseBody
 	public HopperBaseReturn verifiPort(@RequestParam(value="port")int port,@RequestParam(value="serverid")String serverid) {
@@ -279,14 +292,59 @@ public class ServerController {
 		try{
 			ret.setSuccess(true);
 			ret.setRetObj(ss.verifyPort(port,serverid));
-			ret.setMsg("所有操作返回成功");
+			ret.setMsg("验证端口返回成功");
 		}catch(Exception e){
 			ret.setSuccess(false);
-			ret.setMsg("抱歉，服务未能返回数据。");
+			ret.setMsg("验证端口错误!");
 			ret.setErrorDetail(e.getMessage());
-			logger.error("查询历史操作错误!",e);
+			logger.error("验证端口错误!",e);
 		}
 		return ret;
+	}
+	
+	@ResponseBody
+	@RequestMapping({"upload"})
+	public HopperBaseReturn upload(HttpServletRequest req, HttpServletResponse resp,
+									@RequestParam(value="url", required=false) String url, 
+									@RequestParam(value="name", required=false) String name) throws IOException{
+		
+		HopperBaseReturn ret = new HopperBaseReturn();
+		try{
+			
+			if ((req instanceof MultipartHttpServletRequest) && 
+					!CollectionUtils.isEmpty(((MultipartHttpServletRequest)req).getFileMap())) {
+				Map<String, MultipartFile> fileMap = ((MultipartHttpServletRequest)req).getFileMap();
+				for (Map.Entry<String, MultipartFile> entry : fileMap.entrySet())
+		        {
+					MultipartFile file = (MultipartFile)entry.getValue();
+		          
+					//byte[] data = file.getBytes();
+					if (StringUtils.isBlank(name)) {
+						name = file.getOriginalFilename();
+	                
+					}
+		          
+					String localPath = serverWarDir + File.separatorChar + name;  
+					
+	             	File newFile = new File(localPath);  
+	             	if(newFile.exists()) {
+	             		throw new HopperException("01002", "war包已经存在！");
+	             	}
+	             	//上传的文件写入到指定的文件中  
+	             	file.transferTo(newFile); 
+	             	ret.setRetObj(newFile.getAbsolutePath());
+		        }
+			}
+			ret.setSuccess(true);
+			ret.setMsg("上传成功!");
+		}catch(Exception e){
+			ret.setSuccess(false);
+			ret.setMsg("上传失败:"+e.getMessage());
+			ret.setErrorDetail(e.getMessage());
+			logger.error("上传失败!",e);
+		}
+		return ret;
+		
 	}
 }
 

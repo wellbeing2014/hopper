@@ -53,9 +53,11 @@
         <div class="mt-repeater">
             <div class="layui-form-item">
                 <label class="layui-form-label"><span style="color:red;font-size:20px">* </span>应用配置</label>
-                <a href="javascript:;" data-repeater-create  style="margin-left: 0px">
-                    <i class="layui-icon" >&#xe654;</i>
+                 <div class="layui-input-inline " style="width:70px">
+                <a href="javascript:;" title="添加应用" data-repeater-create  style="position:relative;text-align: center;top:6px">
+                    <i class="layui-icon" style="font-size: 30px;" >&#xe654;</i>
                 </a>
+                </div>
             </div>
 
             <div data-repeater-list="tomcatpaths" class="layui-form-item" style="padding-left: 50px">
@@ -67,9 +69,15 @@
                     <label class="layui-form-label">docbase</label>
                     <div class="layui-input-inline " style="width: 250px;">
                         <input type="text" name="docbase" placeholder="D:/webapps" class="layui-input" /> </div>
-                    <a href="javascript:;" data-repeater-delete  class="layui-btn layui-btn-danger" >
-                        <i class="layui-icon" >&#x1006;</i>
+                    <div class="layui-input-inline " style="width:70px">
+                    <a href="javascript:;" onclick="selectFile(this)"  title="上传war包" class="update" style="position:relative;text-align: center;top:6px" >
+                        <i class="layui-icon" style="font-size: 30px;" >&#xe681;</i>
                     </a>
+                    <input type="file"  name="upload"  onchange="upload(this)" accept=".war,.WAR" style="display:none;"/>  
+                    <a href="javascript:;" title="删除" data-repeater-delete style="position:relative;text-align: center;top:6px" >
+                        <i class="layui-icon" style="font-size: 30px;color: red;">&#x1006;</i>
+                    </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -227,6 +235,8 @@
                 var shutport = parseInt($("#mainport").val())+10000;
                 $("#shutport").val(shutport)
             });
+            
+           
             //监听提交
             form.on('submit(demo1)', function(data) {
             	
@@ -278,6 +288,37 @@
                 });
                 return false;
             });
+            
+            var file_o;
+            window.selectFile = function(ele){
+            	var pathele = $(ele).parent().parent().find("input")[2];
+            	var file_input = $(ele).next();
+            	file_o=file_input;
+            	$(file_input).click();
+            }
+            window.upload= function(ele){
+            	var pathele = $(ele).parent().parent().find("input")[2];
+            	var formData = new FormData();
+            	formData.append('file', ele.files[0]);
+            	
+            	req({
+                    url:'/server/upload',
+                    method:'post',
+                    contentType:false,
+                    data:formData,
+                    //async:false,
+                    processData: false,
+                    success:function (ret) {
+                    	 $(pathele).val(ret.retObj);
+                    	layer.msg(ret.msg, {
+                    		  icon: 1,
+                    		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
+                    		});   
+                    }
+                });
+            	$(ele).replaceWith(file_o);
+            	
+            }
         });
     </script>
 

@@ -30,7 +30,8 @@ layui.define(['jquery', 'layer'], function(exports){
             async:settings.async,
             //dataType: 'json',
             dataType:settings.dataType? settings.dataType:'',
-            contentType:settings.contentType? settings.contentType:'',
+            contentType:settings.contentType? settings.contentType:false,
+            processData:settings.processData? true:false,
             beforeSend: function ()
             {
                 settings.loader = layer.msg('数据加载中～', {

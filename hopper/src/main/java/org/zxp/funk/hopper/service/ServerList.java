@@ -57,11 +57,17 @@ public class ServerList {
 	@Value("${server.config.dir}")
 	String serverConfigDir;
 	
+	@Value("${server.war.dir}")
+	String serverWarDir;
+	
 	@PostConstruct
 	public void init() throws Exception{
 		logger.info("正在检测服务配置目录是否可用："+serverConfigDir);
 		File configdir = new File(serverConfigDir);
 		configdir.mkdirs();
+		logger.info("正在检测服务WAR包目录是否可用："+serverConfigDir);
+		File wardir = new File(serverWarDir);
+		wardir.mkdirs();
 		logger.info("正在装填服务："+serverRep.count()+"条");
 		List<TomcatServer> serverlist = serverRep.findAll();
 		

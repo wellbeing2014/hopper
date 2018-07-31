@@ -13,6 +13,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -98,7 +100,17 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
     
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-    	registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/server/*");
+    	registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/server/*").excludePathPatterns("/server/upload");
     }
+    
+    @Bean
+	public MultipartResolver multipartResolver() {
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+		multipartResolver.setMaxInMemorySize(1024*1024*10);
+		multipartResolver.setMaxUploadSize(1024*1024*50);
+		multipartResolver.setDefaultEncoding("utf-8");
+		//multipartResolver.setUploadTempDir(new Resource);
+		return multipartResolver;
+	}
 
 }
