@@ -124,7 +124,7 @@
             req({
                 url:'/system/addJdk.json',
                 method:'post',
-                contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                contentType:'application/x-www-form-urlencoded;charset=UTF-8',
                 data:a,
                 success:function (ret) {
                 	active['refresh'].call();
@@ -171,7 +171,7 @@
                         url:'./system/delJdk.json',
                         method:'POST',
                         data:{id:data.id},
-                        contentType:'application/x-www-form-urlencoded; charset=UTF-8',
+                        contentType:'application/x-www-form-urlencoded;charset=UTF-8',
                         success:function (ret) {
                         	layer.msg(ret.msg, {
                       		  icon: 1,

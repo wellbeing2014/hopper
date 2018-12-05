@@ -15,10 +15,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -26,6 +26,7 @@ import org.zxp.funk.hopper.core.HopperException;
 import org.zxp.funk.hopper.jpa.entity.TomcatServer;
 import org.zxp.funk.hopper.pojo.OperationLog;
 import org.zxp.funk.hopper.service.ServerService;
+import org.zxp.funk.hopper.utils.FilesUtil;
 import org.zxp.funk.hopper.utils.WebUtil;
 
 @Controller
@@ -129,11 +130,19 @@ public class ServerController {
 	 */
 	@RequestMapping(value="add.json", method = RequestMethod.POST)
 	@ResponseBody
-	public HopperBaseReturn addServer(@RequestBody TomcatServer server){
+	public HopperBaseReturn addServer(@RequestPart("server")TomcatServer server ,@RequestPart("file")MultipartFile[] files){
 		HopperBaseReturn ret = new HopperBaseReturn();
 		boolean isNew = server.getServerid()==null||server.getServerid().isEmpty();
 		try{
 			String ip = webutil.getClientIp() ;
+			for (MultipartFile file : files)
+	        {
+				String localPath = serverWarDir + File.separatorChar + file.getOriginalFilename();  
+             	File newFile = FilesUtil.fileAutoRename(new File(localPath), 1);
+             	//上传的文件写入到指定的文件中  
+             	file.transferTo(newFile); 
+	        }
+			
 			TomcatServer saved = ss.addServer(server,ip);
 			ret.setSuccess(true);
 			ret.setRetId(saved.getServerid());
@@ -189,8 +198,7 @@ public class ServerController {
 	 */
 	@RequestMapping(value="operate.json", method = RequestMethod.GET)
 	@ResponseBody
-	public HopperBaseReturn operate(
-										@RequestParam("id") String id, 
+	public HopperBaseReturn operate(	@RequestParam("id") String id, 
 										@RequestParam(value="type") int type){
 		String ip = webutil.getClientIp() ;
 		HopperBaseReturn ret = new HopperBaseReturn();

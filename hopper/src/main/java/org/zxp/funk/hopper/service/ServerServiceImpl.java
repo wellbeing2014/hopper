@@ -81,10 +81,12 @@ public class ServerServiceImpl implements ServerService {
 		sc.setLasttime(createtime);
 		sc.setJdk(system.findOneJdk(sc.getJdk().getId()));
 		sc.setTomcat(system.findOneTomcat(sc.getTomcat().getId()));
+		sc=serverrep.save(sc);
 		if(isNew)
 			serverlist.add(sc);
 		else 
 			serverlist.update(sc);
+		
 		ServerOperation so = new ServerOperation(sc.getServerid());
 		if (isNew)
 			so.setOperationtype(OperationType.新建);

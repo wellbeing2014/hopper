@@ -55,29 +55,43 @@
                 <label class="layui-form-label"><span style="color:red;font-size:20px">* </span>应用配置</label>
                  <div class="layui-input-inline " style="width:70px">
                 <a href="javascript:;" title="添加应用" data-repeater-create  style="position:relative;text-align: center;top:6px">
-                    <i class="layui-icon" style="font-size: 30px;" >&#xe654;</i>
+                    <i class="layui-icon" style="font-size: 26px;" >&#xe654;</i>
                 </a>
                 </div>
             </div>
 
             <div data-repeater-list="tomcatpaths" class="layui-form-item" style="padding-left: 50px">
-                <div data-repeater-item class="layui-inline">
-                	<input type="hidden" name="pathid" /> 
-                    <label class="layui-form-label">context</label>
-                    <div class="layui-input-inline" style="width: 150px;">
-                        <input type="text" name="contextpath" placeholder="/app" class="layui-input" /> </div>
-                    <label class="layui-form-label">docbase</label>
-                    <div class="layui-input-inline " style="width: 250px;">
-                        <input type="text" name="docbase" placeholder="D:/webapps" class="layui-input" /> </div>
-                    <div class="layui-input-inline " style="width:70px">
-                    <a href="javascript:;" onclick="selectFile(this)"  title="上传war包" class="update" style="position:relative;text-align: center;top:6px" >
-                        <i class="layui-icon" style="font-size: 30px;" >&#xe681;</i>
-                    </a>
-                    <input type="file"  name="upload"  onchange="upload(this)" accept=".war,.WAR" style="display:none;"/>  
-                    <a href="javascript:;" title="删除" data-repeater-delete style="position:relative;text-align: center;top:6px" >
-                        <i class="layui-icon" style="font-size: 30px;color: red;">&#x1006;</i>
-                    </a>
+                <div data-repeater-item >
+                	
+                	 <div class="layui-form-item">
+                		<input type="hidden" name="pathid" /> 
+                   	    <label class="layui-form-label">上下文</label>
+                         <div class="layui-input-block" style="width: 140px;">
+                        	<input type="text" name="contextpath" placeholder="/app" class="layui-input" /> </div>
                     </div>
+                    
+                	 <div class="layui-form-item">
+                		<label class="layui-form-label">服务路径</label>
+                    	<div class="layui-input-block ">
+	                    	<div style="text-align: right;display:inline-flex;width:100%">
+		                        <input type="text" name="docbase" placeholder="D:/webapps" class="layui-input" style="margin-right:10px" />
+		                        <a href="javascript:;" onclick="selectFile(this)"  title="上传war包" class="update" style="position:relative;text-align: center;top:6px" >
+				                        <i class="layui-icon" style="font-size: 26px;" >&#xe681;</i>
+			                    </a>
+			                    <input type="file" class="warfile"  name="upload"  onchange="upload(this)" accept=".war,.WAR" style="display:none;"/>  
+			                    <a href="javascript:;" onclick="clearFile(this)"  title="清除 " class="update" style="position:relative;text-align: center;top:6px" >
+			                        <i class="layui-icon" style="font-size: 26px;" >&#xe64d;</i>
+			                    </a>
+			                     <a href="javascript:;" title="删除" data-repeater-delete style="position:relative;text-align: center;top:6px" >
+			                        <i class="layui-icon" style="font-size: 26px;color: red;">&#x1006;</i>
+			                    </a>
+		                    </div>
+		                   
+                        </div>
+		                    
+                    </div>
+                    
+                    <hr class="layui-bg-gray">
                 </div>
             </div>
         </div>
@@ -241,6 +255,18 @@
             form.on('submit(demo1)', function(data) {
             	
             	var a = $(data.form).serializeObjectPlus(); 
+            	
+            	var formdata = new FormData();
+				  layui.each($(".layui-form-item input[type='file']"),function(index, elem){
+					  if(elem.files&&elem.files[0]){
+						  formdata.append('file', elem.files[0]);
+					  }
+				  });
+				  
+				  formdata.append('server', new Blob([JSON.stringify(a)], {
+		                type: "application/json"
+		            }));
+				  
             	if(utils.getParameter('id')!=null){
             		layer.alert('如果您在服务运行状态下修改了标星项，服务将自动停止并保存修改项。',{
             			  title: '注意' },
@@ -248,9 +274,10 @@
             				  req({
             	                    url:'/server/add.json',
             	                    method:'post',
-            	                    contentType:'application/json;charset=utf-8',
-            	                    data:JSON.stringify(a),
-            	                    dataType:'json',
+            	                    contentType:false,
+            	                    processData:false,
+            	                    data:formdata,
+            	                    //dataType:'json',
             	                    //async:false,
             	                    success:function (ret) {
 
@@ -269,11 +296,12 @@
             	}
             	else
                 req({
-                    url:'/server/add.json',
+                	url:'/server/add.json',
                     method:'post',
-                    contentType:'application/json;charset=utf-8',
-                    data:JSON.stringify(a),
-                    dataType:'json',
+                    contentType:false,
+                    processData:false,
+                    data:formdata,
+                    //dataType:'json',
                     //async:false,
                     success:function (ret) {
 
@@ -289,35 +317,24 @@
                 return false;
             });
             
-            var file_o;
             window.selectFile = function(ele){
-            	var pathele = $(ele).parent().parent().find("input")[2];
-            	var file_input = $(ele).next();
-            	file_o=file_input;
-            	$(file_input).click();
+            	var pathele = $(ele).parent().find(".warfile");
+            	$(pathele).click();
             }
             window.upload= function(ele){
-            	var pathele = $(ele).parent().parent().find("input")[2];
-            	var formData = new FormData();
-            	formData.append('file', ele.files[0]);
-            	
-            	req({
-                    url:'/server/upload',
-                    method:'post',
-                    contentType:false,
-                    data:formData,
-                    //async:false,
-                    processData: false,
-                    success:function (ret) {
-                    	 $(pathele).val(ret.retObj);
-                    	layer.msg(ret.msg, {
-                    		  icon: 1,
-                    		  time: 1000 //2秒关闭（如果不配置，默认是3秒）
-                    		});   
-                    }
-                });
-            	$(ele).replaceWith(file_o);
-            	
+            	var pathele = $(ele).parent().find(".layui-input");
+            	if(ele.files){
+            		$(pathele).val(ele.files[0].name);
+            	}
+            	else{
+            		$(pathele).val("");
+            	}
+            }
+            
+            window.clearFile = function(ele){
+            	var file_input = $(ele).prev();
+            	$(file_input).val('');
+            	upload(file_input);
             }
         });
     </script>
