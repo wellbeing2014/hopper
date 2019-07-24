@@ -147,7 +147,7 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     	validateEnv();
     	try {
     		running = true;
-			execute(new CommandLine(getTomcatHome()+"/bin/startup.bat"), environment,handler);
+			execute(new CommandLine("cmd /c "+getTomcatHome()+"/bin/startup.bat"), environment,handler);
 			notifyTomcatStatus(new HopperStatusEventObject(this, HopperStatus.STARTED));
 		} catch (Exception e){
 			throw new HopperException("00101","启动服务失败"+e.getMessage());
@@ -161,7 +161,7 @@ public class TomcatExecutor  extends DefaultExecutor implements IhopperExecutor{
     	validateEnv();
     	try {
     		running = true;
-			execute(new CommandLine(getTomcatHome()+"/bin/shutdown.bat"), environment,handler);
+			execute(new CommandLine("cmd /c "+getTomcatHome()+"/bin/shutdown.bat"), environment,handler);
 			notifyTomcatStatus(new HopperStatusEventObject(this, HopperStatus.SHUTDOWN));
 		} catch (Exception e){
 			throw new HopperException("00102","关闭服务失败"+e.getMessage());
